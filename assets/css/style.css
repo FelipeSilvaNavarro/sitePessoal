@@ -2,51 +2,21 @@
 @import url('https://fonts.googleapis.com/css2?family=Geologica:wght@100..900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Finlandica:ital,wght@0,400..700;1,400..700&family=Geologica:wght@100..900&display=swap');
 
+:root {
+  --primary-color: #ffcc00; /* Cor primária */
+  --secondary-color: #3c3c3c; /* Cor secundária */
+  --tertiary-color: #2c2c2c; /* Cor terciária */
+}
+
 body {
   font-family: Arial, sans-serif;
   line-height: 1.6;
   margin: 0;
   padding: 0;
-  background-color: #2c2c2c;
+  background-color: var(--tertiary-color);
   color: #f4f4f4;
 }
-/* Para telas menores */
-@media (max-width: 768px) {
-  header h1 {
-    font-size: 48px; /* Reduz o tamanho da fonte do cabeçalho para telas menores */
-  }
 
-  nav ul {
-    justify-content: center; /* Centraliza os itens do menu */
-  }
-
-  nav ul li {
-    font-size: 20px; /* Reduz o tamanho do texto do menu para telas menores */
-    margin: 0 0.5rem; /* Espaçamento menor entre os itens do menu */
-  }
-
-  .sobre-img {
-    height: 150px; /* Reduz o tamanho da imagem de perfil */
-  }
-
-  .sobre-content {
-    flex-direction: column; /* Coloca a imagem acima do texto na versão mobile */
-  }
-
-  .sobre-texto {
-    text-align: center; /* Centraliza o texto sobre você */
-  }
-
-  .habilidades-grid {
-    grid-template-columns: repeat(1, 1fr); /* Uma coluna para habilidades em telas menores */
-  }
-
-  .projetos-grid {
-    grid-template-columns: repeat(1, 1fr); /* Uma coluna para projetos em telas menores */
-  }
-}
-
-/* Estilos para seções */
 section {
   margin-bottom: 2rem;
 }
@@ -54,17 +24,20 @@ section {
 html {
   scroll-behavior: smooth;
 }
+
 header {
-  background: #333;
+  background: var(--secondary-color);
   color: #fff;
   padding: 1rem;
   text-align: center;
 }
+
 li {
   list-style: none;
 }
+
 a {
-  color: inherit; /* Garante que a cor do texto seja herdada */
+  color: inherit;
 }
 
 header h1 {
@@ -73,26 +46,39 @@ header h1 {
   text-align: center;
 }
 
+.navbar-custom .navbar-nav .nav-link {
+  color: #ffffff;
+  padding: 0.5rem 1rem;
+}
+
+.navbar-custom .navbar-nav .nav-link:hover {
+  color: var(--primary-color); /* Cor dos links ao passar o mouse */
+}
+
 nav ul {
   list-style: none;
   padding: 0;
   display: flex;
   justify-content: flex-end;
 }
+
 nav ul li {
   font-size: 30px;
   margin: 0 1rem;
 }
+
 nav ul li a {
   color: #fff;
   text-decoration: none;
 }
+
 nav ul li:hover {
   transition: transform 0.5s ease-in-out;
   transform: scale(1.1) translateY(-5px);
 }
+
 nav ul li a:hover {
-  color: #ffcc00; /* Cor ao passar o mouse */
+  color: var(--primary-color);
 }
 
 h1,
@@ -103,68 +89,71 @@ h5,
 h6 {
   font-family: 'Geologica', sans-serif;
   font-weight: bold;
-  font-size: 2rem;
 }
+
 h2 {
   font-size: 5rem;
   text-align: center;
 }
+
 h3 {
   font-size: 2rem;
   text-align: center;
 }
+
 li,
 p {
   font-family: 'Finlandica', sans-serif;
 }
+
 main {
   padding: 2rem;
 }
+
 section {
   margin-bottom: 2rem;
 }
 
 .sobre {
-  background-color: #3c3c3c;
+  background-color: var(--secondary-color);
   padding: 2rem;
   border-radius: 8px;
-  text-align: center;
 }
+
 .sobre p {
   font-size: 20px;
-  text-align: center;
 }
+
 .sobre h2 {
   margin: 0;
 }
+
 .sobre-content {
   display: flex;
-  align-items: center;
 }
+
 .sobre-img {
   border-radius: 50%;
-  height: 200px;
-  object-fit: cover;
 }
+
 .sobre-texto {
   width: 100%;
   text-align: right;
 }
-
-.habilidades-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-auto-rows: auto;
-  gap: 1.5rem;
+.habilidades {
+  margin: 0px;
 }
+
 .habilidade-item {
-  background-color: #3c3c3c;
+  background-color: var(--secondary-color);
   padding: 1rem;
   border: 1px solid #444;
   border-radius: 8px;
   display: flex;
   align-items: center;
+  height: 100%;
 }
+
 .habilidade-item img {
   width: 50px;
   height: auto;
@@ -172,100 +161,102 @@ section {
 }
 
 .projetos {
-  background-color: #2c2c2c;
+  margin: 0px;
+  background-color: var(--tertiary-color);
   color: #f4f4f4;
-  padding: 2rem;
+  padding: 5rem 0;
   text-align: center;
-}
-.projetos h2 {
-  margin-top: 0;
-  margin-bottom: 2rem;
 }
 .projetos p {
   font-size: 1.8rem;
   margin-bottom: 2rem;
 }
-.projetos-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-auto-rows: auto;
-  gap: 1.5rem;
-}
+
 .projeto-item {
-  background: #3c3c3c;
+  margin: 0px;
+  background: var(--secondary-color);
   padding: 1.5rem;
   text-align: center;
   border-radius: 8px;
 }
+
 .projeto-imagem {
   width: 100%;
   height: auto;
   border-radius: 8px;
   margin-bottom: 1rem;
 }
+
 .projeto-item h3 {
   font-size: 2rem;
   margin-bottom: 1rem;
 }
+
 .projeto-item p {
   font-size: 1.6rem;
   margin-bottom: 1rem;
 }
+
 .projeto-item a {
   display: inline-block;
-  background-color: #ffcc00;
+  background-color: var(--primary-color);
   color: #333;
   padding: 0.5rem 1rem;
   text-decoration: none;
   border-radius: 4px;
   transition: transform 0.3s ease;
 }
+
 .projeto-item a:hover {
   background-color: #ffc400;
-  transform: scale(1.1) translateY(-5px);
+  transform: scale(1.1) translate(-5px);
 }
 
 footer {
-  background: #333;
+  background: var(--secondary-color);
   color: #fff;
   text-align: center;
   padding: 1rem;
 }
-.footer-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-}
+
 .footer-column {
   text-align: center;
 }
+
 .footer-column p {
   margin: 0;
-  font-size: 1.7rem;
+  font-size: 1.6rem;
 }
+
 .footer-column li {
   font-size: 1.5rem;
 }
+
 .contato h2 {
   margin: 0px 0px 100px 0px;
 }
+
 .footer-column img {
   width: 30px;
   height: auto;
   margin-bottom: 0.5rem;
 }
+
 .footer-column ul li {
   display: flex;
   align-items: center;
 }
+
 .footer-column ul li img {
   margin-right: 1rem;
 }
+
 .footer-column a {
   display: flex;
   align-items: center;
   color: #fff;
 }
+
 .footer-column a img {
   width: 30px;
   height: auto;
