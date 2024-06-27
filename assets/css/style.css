@@ -10,6 +10,47 @@ body {
   background-color: #2c2c2c;
   color: #f4f4f4;
 }
+/* Para telas menores */
+@media (max-width: 768px) {
+  header h1 {
+    font-size: 48px; /* Reduz o tamanho da fonte do cabeçalho para telas menores */
+  }
+
+  nav ul {
+    justify-content: center; /* Centraliza os itens do menu */
+  }
+
+  nav ul li {
+    font-size: 20px; /* Reduz o tamanho do texto do menu para telas menores */
+    margin: 0 0.5rem; /* Espaçamento menor entre os itens do menu */
+  }
+
+  .sobre-img {
+    height: 150px; /* Reduz o tamanho da imagem de perfil */
+  }
+
+  .sobre-content {
+    flex-direction: column; /* Coloca a imagem acima do texto na versão mobile */
+  }
+
+  .sobre-texto {
+    text-align: center; /* Centraliza o texto sobre você */
+  }
+
+  .habilidades-grid {
+    grid-template-columns: repeat(1, 1fr); /* Uma coluna para habilidades em telas menores */
+  }
+
+  .projetos-grid {
+    grid-template-columns: repeat(1, 1fr); /* Uma coluna para projetos em telas menores */
+  }
+}
+
+/* Estilos para seções */
+section {
+  margin-bottom: 2rem;
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -17,6 +58,7 @@ header {
   background: #333;
   color: #fff;
   padding: 1rem;
+  text-align: center;
 }
 li {
   list-style: none;
@@ -86,6 +128,7 @@ section {
   background-color: #3c3c3c;
   padding: 2rem;
   border-radius: 8px;
+  text-align: center;
 }
 .sobre p {
   font-size: 20px;
@@ -123,7 +166,7 @@ section {
   align-items: center;
 }
 .habilidade-item img {
-  width: 50px; /* Ajuste conforme necessário */
+  width: 50px;
   height: auto;
   margin-right: 1rem;
 }
@@ -155,7 +198,7 @@ section {
   border-radius: 8px;
 }
 .projeto-imagem {
-  width: 100%; /* Ajuste conforme necessário */
+  width: 100%;
   height: auto;
   border-radius: 8px;
   margin-bottom: 1rem;
@@ -188,7 +231,6 @@ footer {
   text-align: center;
   padding: 1rem;
 }
-/* Rodapé em 3 colunas */
 .footer-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
