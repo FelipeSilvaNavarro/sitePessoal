@@ -1,3 +1,7 @@
+/* TODO 
+  - Ajustar problema na verificação de duplicidades | Esta retornando false após a segunda verificação
+*/
+
 // Variáveis de seleção que poderão ser usadas globalmente
 const p = document.querySelector('p')
 const btn = document.querySelector('.adicionar')
