@@ -1,0 +1,111 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap');
+:root {
+  --primary-color: rgb(17, 86, 102);
+  --primary-color-darker: rgb(9, 48, 56);
+}
+
+* {
+  box-sizing: border-box;
+  outline: 0;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--primary-color);
+  font-family: 'Open sans', sans-serif;
+  font-size: 1.3em;
+  line-height: 1.5em;
+}
+
+.container {
+  max-width: 640px;
+  margin: 50px auto;
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.container h1 {
+  justify-content: center;
+  text-align: center;
+  margin: 0px;
+}
+
+.campo {
+  width: 100%;
+  height: 25px;
+  margin-bottom: 15px;
+}
+
+.digiteTarefa {
+  margin: 0;
+  margin-bottom: 10px;
+}
+
+.adicionar {
+  width: 100%;
+  background-color: rgb(78, 109, 177);
+  border-radius: 15px;
+  box-shadow: none;
+  text-shadow: none;
+  font-size: 17px;
+  border: 2px solid rgb(78, 109, 177);
+  color: #fff;
+  cursor: pointer;
+  padding: 5px 0;
+}
+
+.adicionar:hover {
+  background-color: rgb(60, 84, 140);
+  border-color: rgb(60, 84, 140);
+}
+
+.btnApagar {
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 100%;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+}
+
+.btnApagar:hover {
+  background-color: darkred;
+}
+
+.tarefas {
+  list-style-type: none;
+}
+
+.tarefa {
+  /* Cada LI */
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  border: 2px grey;
+  border-style: groove;
+  border-radius: 5px;
+  margin: 0px 50px 10px 0px; /* Ajuste a margem direita para 0 */
+}
+
+.btnApagarTudo {
+  width: 100%;
+  padding: 5px 0;
+  background-color: #f44336;
+  color: white;
+  border: 2px solid #f44336;
+  border-radius: 15px;
+  font-size: 17px;
+  margin-top: 10px;
+  cursor: pointer;
+  text-align: center;
+  box-shadow: none;
+  text-shadow: none;
+}
+
+.btnApagarTudo:hover {
+  background-color: #d32f2f;
+  border-color: #d32f2f;
+}
