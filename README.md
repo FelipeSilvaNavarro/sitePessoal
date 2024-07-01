@@ -18,6 +18,7 @@ Você pode acessar o site através deste link: [Meu Site Pessoal](https://Felipe
 - `index.html`: Arquivo principal do site.
 - `assets/`: Diretório contendo imagens, ícones e outros recursos.
 - `listaDeTarefas/`: Diretório contendo o projeto "Lista de Tarefas".
+- `calculadoraIMC/`: Diretório contendo o projeto "Calculadora IMC"
 
 ## Contato
 

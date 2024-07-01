@@ -1,0 +1,99 @@
+/* Variavel global */
+@import url('https://fonts.googleapis.com/css2?family=Reddit+Sans:ital,wght@0,200..900;1,200..900&display=swap');
+
+:root {
+  --primary-color: rgb(71, 71, 71);
+  --primary-color-darker: rgb(9, 48, 56);
+  --background-color: #222;
+  --form-background-color: #222;
+  --text-color: #fff;
+}
+
+* {
+  box-sizing: border-box;
+  outline: 0;
+}
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--background-color);
+  color: var(--text-color);
+  font-family: 'Open sans', sans-serif;
+  font-size: 1.3em;
+  line-height: 1.5em;
+}
+.container {
+  max-width: 640px;
+  margin: 50px auto;
+  padding: 20px;
+  background-color: var(--primary-color);
+  border-radius: 10px;
+}
+
+h1 {
+  text-align: center;
+}
+#textoCalcule {
+  text-align: center;
+}
+form {
+  background-color: var(--form-background-color);
+  padding: 20px;
+  border-radius: 10px;
+}
+
+form input,
+form label,
+form button {
+  display: block;
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+form input {
+  background-color: var(--primary-color-darker);
+  color: var(--text-color);
+}
+
+form label {
+  color: #aaa;
+}
+
+form button {
+  background-color: var(--primary-color-darker);
+  color: var(--text-color);
+  border: none;
+  cursor: pointer;
+}
+
+form button:hover {
+  background-color: var(--primary-color);
+}
+
+.columns {
+  display: flex;
+}
+
+.column {
+  flex: 1;
+  padding: 0 10px;
+  text-align: center;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+.column h2 {
+  margin-top: 0;
+}
+
+.resultado {
+  background-color: var(--background-color);
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 20px;
+}
