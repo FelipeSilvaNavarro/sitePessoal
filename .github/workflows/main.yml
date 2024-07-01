@@ -3,7 +3,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - gh-pages
+      - main
 
 jobs:
   build:
@@ -23,7 +23,7 @@ jobs:
 
       - name: Build project
         run: npm run build
-        
+
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
         with:
