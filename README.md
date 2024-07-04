@@ -4,7 +4,8 @@ Bem-vindo ao repositório do meu site pessoal! Este site apresenta uma coleção
 
 ## Visite o Site
 
-Você pode acessar o site através deste link: [Meu Site Pessoal](https://FelipeSilvaNavarro.github.io/sitePessoal)
+Você pode acessar o site através deste link: [Meu Site Pessoal](https://FelipeSilvaNavarro.github.io/sitePessoal){:target="_blank"}
+
 
 ## Tecnologias Utilizadas
 
