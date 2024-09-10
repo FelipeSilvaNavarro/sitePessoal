@@ -314,7 +314,11 @@ footer {
   margin-right: 10px;
 }
 
-/* Efeito ao passar o mouse nos links do rodapé */
+footer a {
+  display: inline-block;
+}
+/* Estilos aplicados ao passar o mouse (hover) */
 footer a:hover {
-  transform: rotate(3deg);
+  transition: transform 0.3s ease;
+  transform: scale(1.1) translate(-5px);
 }
