@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PsyIA — Inteligência em Saúde Mental</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
     <style>
@@ -793,9 +794,9 @@
             <div style="flex:1"></div>
 
             <div class="api-section">
-                <div class="api-label">Chave API OpenAI</div>
+                <div class="api-label">Chave API Groq</div>
                 <div class="api-input-wrap">
-                    <input type="password" class="api-input" id="apiKeyInput" placeholder="sk-proj-..." />
+                    <input type="password" class="api-input" id="apiKeyInput" placeholder="gsk_..." />
                     <button class="api-save" onclick="saveKey()">OK</button>
                 </div>
                 <div class="api-status" id="apiStatus">Nenhuma chave salva</div>
@@ -868,7 +869,7 @@
 
     <script>
         let currentMode = 'support'
-        let apiKey = localStorage.getItem('psyia_key') || ''
+        let apiKey = localStorage.getItem('psyia_groq_key') || ''
         let history = []
         let isLoading = false
 
@@ -883,7 +884,7 @@
             const val = document.getElementById('apiKeyInput').value.trim()
             if (!val) return
             apiKey = val
-            localStorage.setItem('psyia_key', val)
+            localStorage.setItem('psyia_groq_key', val)
             const s = document.getElementById('apiStatus')
             s.textContent = '✓ Chave salva com sucesso'
             s.classList.add('ok')
@@ -1090,7 +1091,7 @@
             if (ab) ab.disabled = val
         }
 
-        // === OPENAI API ===
+        // === GROQ API ===
         async function callOpenAI (messages, mode) {
             const systemPrompt = mode === 'support'
                 ? `Você é PsyIA, uma inteligência artificial especializada em saúde mental com abordagem acolhedora e empática. Você combina técnicas de Terapia Cognitivo-Comportamental (TCC), Psicologia Humanista e Mindfulness. 
@@ -1112,14 +1113,14 @@ Com base nas informações do paciente, você deve fornecer:
 
 IMPORTANTE: Sempre esclareça que esta análise é uma ferramenta de apoio ao profissional habilitado, não um diagnóstico oficial. Escreva em português brasileiro com linguagem técnica e precisa.`
 
-            const res = await fetch('https://api.openai.com/v1/chat/completions', {
+            const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${apiKey}`
                 },
                 body: JSON.stringify({
-                    model: 'gpt-4o-mini',
+                    model: 'llama-3.3-70b-versatile',
                     messages: [ { role: 'system', content: systemPrompt }, ...messages ],
                     max_tokens: 1000,
                     temperature: mode === 'support' ? 0.85 : 0.4
