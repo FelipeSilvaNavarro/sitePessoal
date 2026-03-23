@@ -35,6 +35,7 @@
     .mode-tabs { display: flex; gap: 0; padding: 12px 16px; border-bottom: 1px solid rgba(122,158,135,0.12); flex-shrink: 0; }
     .mode-tab { flex: 1; padding: 9px 6px; background: transparent; border: 1px solid rgba(122,158,135,0.15); color: rgba(245,240,232,0.45); font-family: 'DM Mono', monospace; font-size: 10px; cursor: pointer; transition: all 0.2s; text-align: center; -webkit-tap-highlight-color: transparent; }
     .mode-tab:first-child { border-radius: 7px 0 0 7px; }
+    .mode-tab, .new-conv-btn, .new-patient-btn, .conv-item, .patient-item { touch-action: manipulation; }
     .mode-tab:last-child { border-radius: 0 7px 7px 0; border-left: none; }
     .mode-tab.active { background: rgba(122,158,135,0.2); border-color: rgba(122,158,135,0.4); color: var(--cream); }
 
@@ -54,6 +55,7 @@
 
     .conv-item { padding: 10px 12px; border-radius: 9px; cursor: pointer; margin-bottom: 4px; border: 1px solid transparent; transition: all 0.18s; -webkit-tap-highlight-color: transparent; }
     .conv-item:hover, .conv-item:active { background: rgba(122,158,135,0.1); border-color: rgba(122,158,135,0.2); }
+    .conv-item, .patient-item { cursor: pointer; -webkit-user-select: none; user-select: none; }
     .conv-item.active { background: rgba(122,158,135,0.18); border-color: rgba(122,158,135,0.35); }
     .conv-item-title { font-size: 11px; color: rgba(245,240,232,0.8); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .conv-item-meta { font-size: 9px; color: rgba(245,240,232,0.3); margin-top: 3px; }
@@ -91,7 +93,8 @@
     /* === MOBILE === */
     .menu-toggle { display: none; position: fixed; top: 12px; left: 12px; z-index: 500; background: rgba(24,24,24,0.93); border: 1px solid rgba(122,158,135,0.4); border-radius: 9px; width: 40px; height: 40px; cursor: pointer; flex-direction: column; align-items: center; justify-content: center; gap: 4px; -webkit-tap-highlight-color: transparent; }
     .menu-toggle span { display: block; width: 17px; height: 2px; background: var(--sage-light); border-radius: 2px; }
-    .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 490; }
+    .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 490; pointer-events: none; }
+    .sidebar-overlay.open { pointer-events: auto; }
 
     /* API modal */
     .api-modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 600; align-items: center; justify-content: center; padding: 20px; }
@@ -184,7 +187,7 @@
     @media (max-width: 700px) {
       :root { --sidebar-w: 285px; }
       .app { grid-template-columns: 1fr; }
-      .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: var(--sidebar-w); z-index: 495; transform: translateX(-100%); }
+      .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: var(--sidebar-w); z-index: 496; transform: translateX(-100%); }
       .sidebar.open { transform: translateX(0); box-shadow: 4px 0 30px rgba(0,0,0,0.45); }
       .sidebar-header { padding-top: 62px; } /* clear hamburger */
       .sidebar-overlay.open { display: block; }
@@ -465,6 +468,16 @@ function handleTopbarAction() {
 // SUPPORT — CONVERSATIONS
 // ================================================================
 function newConversation() {
+  // If current conversation is empty, just show welcome — don't create another
+  if (currentConvId) {
+    const convs = DB.convs();
+    const current = convs.find(c => c.id === currentConvId);
+    if (current && current.messages.length === 0) {
+      renderWelcomeSupport();
+      closeSidebar();
+      return;
+    }
+  }
   const id = 'conv_' + Date.now();
   const convs = DB.convs();
   convs.unshift({ id, title: 'Nova conversa', date: new Date().toLocaleDateString('pt-BR'), messages: [] });
@@ -540,6 +553,16 @@ function saveCurrentConv(messages) {
 // PRO — PATIENTS
 // ================================================================
 function newPatient() {
+  // If current patient has no messages, just show welcome — don't create another
+  if (currentPatientId) {
+    const patients = DB.patients();
+    const current = patients.find(p => p.id === currentPatientId);
+    if (current && current.messages.length === 0) {
+      renderWelcomePro(current.name);
+      closeSidebar();
+      return;
+    }
+  }
   const name = prompt('Nome ou código do paciente:');
   if (!name || !name.trim()) return;
   const id = 'pat_' + Date.now();
