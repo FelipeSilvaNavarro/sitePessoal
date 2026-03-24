@@ -59,6 +59,12 @@
     }
 
     /* === SIDEBAR === */
+
+    .sidebar,
+    .sidebar * {
+      cursor: pointer;
+    }
+
     .sidebar {
       background: rgba(24, 24, 24, 0.97);
       backdrop-filter: blur(20px);
@@ -515,6 +521,7 @@
       outline: none;
       margin-bottom: 14px;
       -webkit-appearance: none;
+      appearance: none;
     }
 
     .api-modal-inp:focus {
@@ -919,6 +926,7 @@
       overflow-y: auto;
       transition: border-color 0.2s;
       -webkit-appearance: none;
+      appearance: none;
     }
 
     .simple-textarea:focus {
@@ -998,6 +1006,7 @@
       outline: none;
       transition: border-color 0.2s;
       -webkit-appearance: none;
+      appearance: none;
     }
 
     .field-input:focus {
@@ -1024,6 +1033,7 @@
       transition: border-color 0.2s;
       margin-bottom: 9px;
       -webkit-appearance: none;
+      appearance: none;
     }
 
     .pro-textarea:focus {
@@ -1472,16 +1482,16 @@
     // ================================================================
     function newConversation () {
       const convs = DB.convs()
-      // Never create a new empty conv if there's already one empty at the top
-      const hasEmptyConv = convs.length > 0 && convs[ 0 ].messages.length === 0
-      if (hasEmptyConv) {
-        // Just switch to that empty conv
-        currentConvId = convs[ 0 ].id
+      // Find ANY empty conversation, not just the top one
+      const emptyConv = convs.find(c => c.messages.length === 0)
+      if (emptyConv) {
+        currentConvId = emptyConv.id
         renderConvList()
         renderWelcomeSupport()
         closeSidebar()
         return
       }
+      // All existing convs have messages — create a new empty one
       const id = 'conv_' + Date.now()
       convs.unshift({ id, title: 'Nova conversa', date: new Date().toLocaleDateString('pt-BR'), messages: [] })
       DB.saveConvs(convs)
