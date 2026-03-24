@@ -1015,6 +1015,12 @@
             overflow: hidden;
             transition: transform .3s var(--ease), border-color .3s, box-shadow .3s;
             position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .project-card:not(.featured) {
+            height: 100%;
         }
 
         .project-card:hover {
@@ -1120,6 +1126,12 @@
             display: flex;
             flex-direction: column;
             gap: .8rem;
+            flex: 1;
+        }
+
+        .project-card .proj-footer {
+            margin-top: auto;
+            padding-top: 1rem;
         }
 
         .project-card.featured .proj-body {
@@ -1166,8 +1178,9 @@
         .proj-footer {
             display: flex;
             align-items: center;
-            gap: 1rem;
-            margin-top: .5rem;
+            justify-content: flex-start;
+            gap: 1.5rem;
+            margin-top: 1.25rem;
             flex-wrap: wrap;
         }
 
@@ -2097,20 +2110,19 @@
                     <h3 class="proj-title">PsyIA</h3>
 
                     <p class="proj-desc">
-                    <p>
                         Aplicação web de interface conversacional com IA voltada para apoio emocional
                         e análise psicológica. A plataforma possui dois modos: um chat empático para
                         conversas reflexivas e um modo profissional que gera análises clínicas
                         estruturadas utilizando modelos LLM via API da Groq.
                     </p>
 
-                    <p>
+                    <p class="proj-desc">
                         O projeto explora integração com inteligência artificial, arquitetura
                         frontend sem backend e persistência de dados no navegador usando
                         LocalStorage.
                     </p>
 
-                    <div class="proj-footer" style="flex-direction:column;align-items:flex-start;gap:.5rem;">
+                    <div class="proj-footer">
                         <a href="https://github.com/FelipeSilvaNavarro/sitePessoal/tree/main/meusProjetos/psyIA" target="_blank" class="proj-link">Ver código →</a>
                         <a href="https://navarrodev.com.br/meusProjetos/psyIA/index.html" target="_blank" class="proj-link">Ver projeto →</a>
                     </div>
