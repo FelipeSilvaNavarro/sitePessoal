@@ -1,14 +1,56 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 
+<!--
+  ============================================================
+  PsyIA — Inteligência em Saúde Mental
+  ============================================================
+  Aplicação single-page de apoio emocional e análise clínica.
+
+  Dois modos de uso:
+    - Apoio       : chat conversacional para o usuário final.
+    - Profissional: formulário estruturado de análise clínica
+                    para psicólogos, com campos de paciente e histórico.
+
+  Stack:
+    - HTML/CSS puro, sem frameworks ou dependências externas.
+    - Google Fonts (Cormorant Garamond + DM Mono) via CDN.
+    - API Groq (llama-3.3-70b-versatile) para inferência de LLM.
+    - localStorage para persistência de conversas e pacientes.
+    - psyia.js contém toda a lógica JS, documentada em JSDoc.
+  ============================================================
+-->
+
 <head>
   <meta charset="UTF-8" />
+
+  <!--
+    interactive-widget=resizes-content: em mobile, faz o teclado virtual
+    redimensionar o conteúdo em vez de sobrepor — essencial para que o
+    campo de texto fique visível ao digitar.
+  -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content" />
+
   <title>PsyIA — Inteligência em Saúde Mental</title>
+
+  <!-- Favicon inline em SVG para evitar requisição de arquivo externo -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>" />
+
+  <!--
+    Fontes via Google Fonts:
+      - Cormorant Garamond: serifa elegante para títulos e logo.
+      - DM Mono: monospace para corpo de texto e elementos de UI.
+    preconnect reduz latência do handshake com o servidor de fontes.
+  -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
+
   <style>
+    /* ─────────────────────────────────────────────
+       RESET GLOBAL
+       Remove margens, paddings e garante box-sizing
+       consistente em todos os elementos e pseudo-elementos.
+    ───────────────────────────────────────────── */
     *,
     *::before,
     *::after {
@@ -17,6 +59,20 @@
       padding: 0;
     }
 
+    /* ─────────────────────────────────────────────
+       DESIGN TOKENS — Variáveis CSS Globais
+       Centraliza paleta, medidas e sombras usadas em
+       todo o sistema. Alterar aqui reflete em toda a UI.
+
+       --sage / --sage-light / --sage-dark : família verde-sálvia,
+         cor primária/acento da marca.
+       --cream   : fundo geral, tom quente e suave.
+       --charcoal: texto principal, quase preto.
+       --muted   : texto secundário, cinza médio.
+       --border  : borda semi-transparente com toque de sage.
+       --shadow  : sombra padrão de cards.
+       --sidebar-w: largura fixa da barra lateral no desktop.
+    ───────────────────────────────────────────── */
     :root {
       --sage: #7a9e87;
       --sage-light: #a8c4b0;
@@ -29,6 +85,11 @@
       --sidebar-w: 300px;
     }
 
+    /* ─────────────────────────────────────────────
+       BASE DO DOCUMENTO
+       html e body com 100% de altura e overflow:hidden,
+       pois o scroll acontece dentro de .chat-area.
+    ───────────────────────────────────────────── */
     html,
     body {
       height: 100%;
@@ -38,17 +99,31 @@
       color: var(--charcoal);
     }
 
+    /* ─────────────────────────────────────────────
+       FUNDO DECORATIVO
+       Dois halos radiais em sage sobrepostos ao fundo creme,
+       criando profundidade sem imagens externas.
+       pointer-events:none evita interferência em cliques.
+    ───────────────────────────────────────────── */
     body::before {
       content: '';
       position: fixed;
       inset: 0;
       pointer-events: none;
       z-index: 0;
-      background: radial-gradient(ellipse 80% 60% at 20% 10%, rgba(168, 196, 176, 0.3) 0%, transparent 60%),
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 10%, rgba(168, 196, 176, 0.3) 0%, transparent 60%),
         radial-gradient(ellipse 60% 80% at 80% 80%, rgba(122, 158, 135, 0.2) 0%, transparent 55%);
     }
 
-    /* === LAYOUT === */
+    /* ─────────────────────────────────────────────
+       LAYOUT PRINCIPAL — .app
+       Container do conteúdo principal (topbar + chat + input).
+       margin-left igual a --sidebar-w afasta o conteúdo da sidebar
+       no desktop. Em mobile, esse valor vai a zero (ver media query).
+       100dvh (dynamic viewport height) corrige problema em mobile
+       com a barra de endereços do browser que redimensiona a viewport.
+    ───────────────────────────────────────────── */
     .app {
       display: block;
       height: 100vh;
@@ -56,8 +131,13 @@
       margin-left: var(--sidebar-w);
     }
 
-    /* === SIDEBAR === */
-
+    /* ─────────────────────────────────────────────
+       SIDEBAR — Barra Lateral Esquerda
+       Posição fixa, fundo escuro com backdrop-filter blur.
+       cursor:pointer em .sidebar e .sidebar * garante que qualquer
+       elemento clicável dentro dela indique isso visualmente.
+       Em mobile vira um drawer deslizante (ver media query).
+    ───────────────────────────────────────────── */
     .sidebar,
     .sidebar * {
       cursor: pointer;
@@ -78,12 +158,17 @@
       z-index: 10;
     }
 
+    /* ─────────────────────────────────────────────
+       CABEÇALHO DA SIDEBAR — Logo e subtítulo
+       flex-shrink:0 impede encolher quando o painel rolar.
+    ───────────────────────────────────────────── */
     .sidebar-header {
       padding: 26px 20px 18px;
       border-bottom: 1px solid rgba(122, 158, 135, 0.15);
       flex-shrink: 0;
     }
 
+    /* Logo: serifa leve com acento itálico em sage-light */
     .logo {
       font-family: 'Cormorant Garamond', serif;
       font-size: 26px;
@@ -97,6 +182,7 @@
       font-style: italic;
     }
 
+    /* Subtítulo em caixa alta, muito pequeno, quase invisível */
     .logo-sub {
       font-size: 9px;
       color: rgba(245, 240, 232, 0.35);
@@ -105,7 +191,13 @@
       margin-top: 3px;
     }
 
-    /* Mode tabs */
+    /* ─────────────────────────────────────────────
+       ABAS DE MODO — Apoio / Profissional
+       Segmented control: dois botões com borda compartilhada.
+       A aba ativa recebe fundo e borda em sage translúcido.
+       touch-action:manipulation desativa double-tap zoom no mobile.
+       -webkit-tap-highlight-color:transparent remove o flash azul no iOS.
+    ───────────────────────────────────────────── */
     .mode-tabs {
       display: flex;
       gap: 0;
@@ -132,6 +224,12 @@
       border-radius: 7px 0 0 7px;
     }
 
+    /* border-left:none no segundo botão une visualmente os dois */
+    .mode-tab:last-child {
+      border-radius: 0 7px 7px 0;
+      border-left: none;
+    }
+
     .mode-tab,
     .new-conv-btn,
     .new-patient-btn,
@@ -145,31 +243,38 @@
       cursor: pointer;
     }
 
-    .mode-tab:last-child {
-      border-radius: 0 7px 7px 0;
-      border-left: none;
-    }
-
     .mode-tab.active {
       background: rgba(122, 158, 135, 0.2);
       border-color: rgba(122, 158, 135, 0.4);
       color: var(--cream);
     }
 
-    /* Sidebar panels */
+    /* ─────────────────────────────────────────────
+       PAINÉIS DA SIDEBAR — Apoio e Profissional
+       display:none / display:flex alternados via JS (switchTab).
+       Cada painel é uma coluna flex com scroll interno independente.
+    ───────────────────────────────────────────── */
     .sidebar-panel {
       display: none;
       flex-direction: column;
       flex: 1;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
+      /* scroll suave em iOS */
     }
 
     .sidebar-panel.active {
       display: flex;
     }
 
-    /* === SUPPORT PANEL: conversation history === */
+    /* ─────────────────────────────────────────────
+       LISTA DE CONVERSAS — Painel Apoio
+       Scrollbar estilizada com 3px para ser discreta.
+       Cada .conv-item é um card clicável com título truncado
+       e meta com data + contagem de mensagens.
+       O botão de deletar (x) fica à direita via float.
+       -webkit-user-select:none evita seleção acidental ao clicar.
+    ───────────────────────────────────────────── */
     .panel-label {
       font-size: 9px;
       letter-spacing: 0.2em;
@@ -273,7 +378,12 @@
       color: #e74c3c;
     }
 
-    /* === PRO PANEL: patients === */
+    /* ─────────────────────────────────────────────
+       LISTA DE PACIENTES — Painel Profissional
+       Estrutura idêntica à lista de conversas.
+       O botão de deletar exige confirm() antes de apagar
+       (implementado no JS) pois histórico clínico é sensível.
+    ───────────────────────────────────────────── */
     .new-patient-btn {
       margin: 8px 14px 4px;
       padding: 10px 14px;
@@ -358,7 +468,13 @@
       color: #e74c3c;
     }
 
-    /* === API SECTION === */
+    /* ─────────────────────────────────────────────
+       SEÇÃO DE API KEY — Rodapé da Sidebar (desktop)
+       Campo de texto para inserir a chave Groq + botão "OK".
+       Em mobile esta seção fica oculta via media query e o acesso
+       é feito pelo modal flutuante acionado na topbar.
+       O botão .api-save é posicionado absolutamente dentro do input.
+    ───────────────────────────────────────────── */
     .api-section {
       padding: 12px 16px 10px;
       border-top: 1px solid rgba(122, 158, 135, 0.12);
@@ -420,10 +536,12 @@
       color: rgba(245, 240, 232, 0.28);
     }
 
+    /* Classe .ok adicionada via JS quando a chave está salva */
     .api-status.ok {
       color: var(--sage-light);
     }
 
+    /* Aviso legal mínimo no rodapé da sidebar */
     .disclaimer {
       padding: 8px 16px 16px;
       font-size: 9px;
@@ -432,7 +550,13 @@
       flex-shrink: 0;
     }
 
-    /* === MOBILE === */
+    /* ─────────────────────────────────────────────
+       MENU HAMBURGER — Visível apenas em mobile
+       Botão fixo no canto superior esquerdo que abre a sidebar
+       como um drawer. display:none no desktop — ativado na
+       media query abaixo de 700px.
+       As três <span> formam o ícone clássico de hamburger.
+    ───────────────────────────────────────────── */
     .menu-toggle {
       display: none;
       position: fixed;
@@ -460,6 +584,12 @@
       border-radius: 2px;
     }
 
+    /* ─────────────────────────────────────────────
+       OVERLAY DA SIDEBAR — Mobile
+       Fundo escurecido atrás da sidebar quando aberta.
+       pointer-events:none por padrão; com .open ativa o clique
+       para fechar ao tocar fora da sidebar.
+    ───────────────────────────────────────────── */
     .sidebar-overlay {
       display: none;
       position: fixed;
@@ -473,7 +603,14 @@
       pointer-events: auto;
     }
 
-    /* API modal */
+    /* ─────────────────────────────────────────────
+       MODAL DE API KEY — Mobile
+       Centralizado com fundo escuro semitransparente.
+       display:flex apenas com a classe .open (controlada via JS).
+       Clicar no .api-modal-bg (fora do card) fecha o modal —
+       o .api-modal usa event.stopPropagation() para não fechar
+       ao clicar dentro.
+    ───────────────────────────────────────────── */
     .api-modal-bg {
       display: none;
       position: fixed;
@@ -513,6 +650,10 @@
       line-height: 1.6;
     }
 
+    /*
+      -webkit-appearance:none / appearance:none: remove estilos nativos
+      do browser em inputs, especialmente no iOS.
+    */
     .api-modal-inp {
       width: 100%;
       padding: 13px 14px;
@@ -570,7 +711,14 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    /* === MAIN === */
+    /* ─────────────────────────────────────────────
+       ÁREA PRINCIPAL — .main
+       Coluna flex de 100% de altura.
+       Três zonas verticais:
+         1. .topbar       → altura fixa (flex-shrink:0)
+         2. .chat-area    → flex:1, absorve o espaço restante
+         3. .input-wrapper → altura fixa (flex-shrink:0)
+    ───────────────────────────────────────────── */
     .main {
       display: flex;
       flex-direction: column;
@@ -579,6 +727,12 @@
       overflow: hidden;
     }
 
+    /* ─────────────────────────────────────────────
+       TOPBAR — Cabeçalho do conteúdo principal
+       Contém: indicador de modo ativo (ponto pulsante + label)
+       e botões de ação à direita (API key mobile + nova conversa).
+       backdrop-filter cria o efeito de vidro fosco sobre o chat.
+    ───────────────────────────────────────────── */
     .topbar {
       padding: 13px 22px;
       display: flex;
@@ -596,8 +750,10 @@
       align-items: center;
       gap: 8px;
       min-width: 0;
+      /* permite truncar o texto se necessário */
     }
 
+    /* Ponto animado que indica o sistema "ativo/ouvindo" */
     .mode-dot {
       width: 7px;
       height: 7px;
@@ -612,12 +768,12 @@
       0%,
       100% {
         opacity: 1;
-        transform: scale(1)
+        transform: scale(1);
       }
 
       50% {
         opacity: 0.5;
-        transform: scale(0.8)
+        transform: scale(0.8);
       }
     }
 
@@ -657,11 +813,19 @@
       color: var(--sage-dark);
     }
 
+    /* Botão de API key visível apenas no mobile.
+       display:none aqui; display:block na media query. */
     .api-topbar-btn {
       display: none;
     }
 
-    /* === CHAT === */
+    /* ─────────────────────────────────────────────
+       ÁREA DE CHAT — .chat-area
+       flex:1 ocupa todo o espaço entre topbar e input.
+       overflow-y:auto permite scroll interno.
+       scroll-behavior:smooth anima o scroll ao rolar para o fim.
+       -webkit-overflow-scrolling:touch melhora o scroll no iOS.
+    ───────────────────────────────────────────── */
     .chat-area {
       flex: 1;
       overflow-y: auto;
@@ -680,6 +844,13 @@
       border-radius: 2px;
     }
 
+    /* ─────────────────────────────────────────────
+       TELA DE BOAS-VINDAS — .welcome
+       Exibida quando não há mensagens na conversa ativa.
+       Centralizada verticalmente com flexbox.
+       Removida do DOM pelo JS quando a primeira mensagem é enviada.
+       Animação fadeIn com translateY para entrada suave.
+    ───────────────────────────────────────────── */
     .welcome {
       display: flex;
       flex-direction: column;
@@ -694,12 +865,12 @@
     @keyframes fadeIn {
       from {
         opacity: 0;
-        transform: translateY(12px)
+        transform: translateY(12px);
       }
 
       to {
         opacity: 1;
-        transform: translateY(0)
+        transform: translateY(0);
       }
     }
 
@@ -729,6 +900,7 @@
       line-height: 1.8;
     }
 
+    /* Chips de atalho: clicar envia texto pré-definido via sendHint() */
     .welcome-hints {
       display: flex;
       gap: 8px;
@@ -754,7 +926,21 @@
       background: rgba(122, 158, 135, 0.22);
     }
 
-    /* === MESSAGES === */
+    /* ─────────────────────────────────────────────
+       MENSAGENS — .message
+       Linha flex com avatar + bubble.
+       .message.user inverte a direção para alinhar à direita.
+       Animação msgIn: aparece suavemente de baixo para cima.
+
+       Avatares circulares:
+         - IA     : gradiente sage, emoji 🌿
+         - Usuário: fundo claro com borda, emoji 👤
+
+       Bolhas (.bubble):
+         - IA     : fundo branco, borda sutil, canto top-left reto
+                    (simula "cauda" apontando para o avatar).
+         - Usuário: fundo sage-dark, texto branco, canto top-right reto.
+    ───────────────────────────────────────────── */
     .message {
       display: flex;
       gap: 10px;
@@ -765,12 +951,12 @@
     @keyframes msgIn {
       from {
         opacity: 0;
-        transform: translateY(6px)
+        transform: translateY(6px);
       }
 
       to {
         opacity: 1;
-        transform: translateY(0)
+        transform: translateY(0);
       }
     }
 
@@ -812,12 +998,14 @@
       background: white;
       border: 1px solid var(--border);
       border-top-left-radius: 4px;
+      /* "cauda" visual apontando para o avatar */
       box-shadow: var(--shadow);
     }
 
     .message.user .bubble {
       background: var(--sage-dark);
       border-top-right-radius: 4px;
+      /* "cauda" visual apontando para o avatar */
       color: white;
     }
 
@@ -833,6 +1021,12 @@
       font-weight: 600;
     }
 
+    /* ─────────────────────────────────────────────
+       CURSOR DE DIGITAÇÃO — Efeito typewriter
+       Bloco inline de 2px que pisca enquanto o texto é
+       "digitado" pela função typeMessage() no JS.
+       Removido do DOM assim que o texto completo é exibido.
+    ───────────────────────────────────────────── */
     .typing-cursor {
       display: inline-block;
       width: 2px;
@@ -847,14 +1041,20 @@
 
       0%,
       100% {
-        opacity: 1
+        opacity: 1;
       }
 
       50% {
-        opacity: 0
+        opacity: 0;
       }
     }
 
+    /* ─────────────────────────────────────────────
+       INDICADOR DE CARREGAMENTO — Três pontos pulsantes
+       Exibido enquanto aguarda resposta da API.
+       Cada ponto tem animation-delay diferente para o efeito
+       sequencial de onda.
+    ───────────────────────────────────────────── */
     .loading-dots {
       display: flex;
       gap: 5px;
@@ -884,16 +1084,24 @@
       80%,
       100% {
         opacity: 0.2;
-        transform: scale(0.8)
+        transform: scale(0.8);
       }
 
       40% {
         opacity: 1;
-        transform: scale(1)
+        transform: scale(1);
       }
     }
 
-    /* === INPUT === */
+    /* ─────────────────────────────────────────────
+       ÁREA DE INPUT — Rodapé fixo
+       flex-shrink:0 garante que nunca encolha.
+       backdrop-filter cria efeito de vidro fosco acima do chat.
+
+       Dois estados alternados via JS:
+         - #simpleInput : textarea + botão enviar (modo Apoio)
+         - #proInput    : campos estruturados + botão analisar (modo Pro)
+    ───────────────────────────────────────────── */
     .input-wrapper {
       flex-shrink: 0;
       border-top: 1px solid var(--border);
@@ -901,6 +1109,13 @@
       backdrop-filter: blur(14px);
     }
 
+    /* ─────────────────────────────────────────────
+       MODO APOIO — Textarea simples + botão enviar
+       font-size:15px (> 14px) evita o zoom automático
+       do iOS ao focar no campo de texto.
+       autoResize() via oninput ajusta a altura dinamicamente,
+       limitada a max-height:120px pelo CSS.
+    ───────────────────────────────────────────── */
     .simple-input-area {
       padding: 11px 18px 15px;
     }
@@ -940,6 +1155,7 @@
       color: rgba(44, 44, 44, 0.32);
     }
 
+    /* Botão de envio quadrado com ícone SVG inline de avião de papel */
     .send-btn {
       width: 46px;
       height: 46px;
@@ -974,6 +1190,12 @@
       fill: white;
     }
 
+    /* ─────────────────────────────────────────────
+       MODO PROFISSIONAL — Formulário estruturado
+       Grid de dois campos (nome + idade/gênero) acima de
+       uma textarea de observações clínicas e botão "Analisar".
+       Em mobile o grid colapsa para uma coluna (ver media query).
+    ───────────────────────────────────────────── */
     .pro-form {
       padding: 11px 18px 15px;
     }
@@ -1074,6 +1296,12 @@
       cursor: not-allowed;
     }
 
+    /* ─────────────────────────────────────────────
+       TOAST DE ERRO — Notificação flutuante
+       Aparece no canto inferior direito, some após 5s.
+       Removido do DOM via setTimeout no JS.
+       Animação slideIn da direita para dentro.
+    ───────────────────────────────────────────── */
     .error-toast {
       position: fixed;
       bottom: 18px;
@@ -1092,16 +1320,32 @@
     @keyframes slideIn {
       from {
         transform: translateX(100px);
-        opacity: 0
+        opacity: 0;
       }
 
       to {
         transform: translateX(0);
-        opacity: 1
+        opacity: 1;
       }
     }
 
-    /* ========== MOBILE ========== */
+    /* ─────────────────────────────────────────────
+       RESPONSIVIDADE — Mobile (max-width: 700px)
+
+       Principais mudanças:
+       - .app perde margin-left (sidebar não ocupa espaço fixo).
+       - .sidebar desloca para left: -285px (fora da tela) e ganha
+         transição CSS; com classe .open retorna para left:0.
+       - .sidebar-header recebe padding-top extra (62px) para não
+         sobrepor o botão hamburger fixo.
+       - .api-section e .disclaimer da sidebar ficam ocultos
+         (substituídos pelo modal acessível via topbar).
+       - .topbar recebe padding-left para compensar o botão fixo.
+       - .bubble pode ocupar até 90% da largura.
+       - .pro-fields colapsa para 1 coluna.
+       - .simple-textarea usa font-size:16px — abaixo de 16px o
+         iOS dispara zoom automático ao focar no campo.
+    ───────────────────────────────────────────── */
     @media (max-width: 700px) {
       :root {
         --sidebar-w: 285px;
@@ -1126,7 +1370,6 @@
         padding-top: 62px;
       }
 
-      /* clear hamburger */
       .sidebar-overlay.open {
         display: block;
       }
@@ -1215,6 +1458,7 @@
       }
     }
 
+    /* Telas muito estreitas: bolhas ocupam quase 100% da largura */
     @media (max-width: 380px) {
       .bubble {
         max-width: 95%;
@@ -1225,17 +1469,39 @@
 
 <body>
 
-  <!-- Hamburger -->
+  <!--
+    BOTÃO HAMBURGER — Mobile
+    Fixo no canto superior esquerdo, exibido apenas em mobile (display:none no desktop).
+    Chama toggleSidebar() ao clicar para abrir/fechar a sidebar.
+    As três <span> formam o ícone de hamburger via CSS (display:flex + gap).
+  -->
   <button class="menu-toggle" id="menuToggle" onclick="toggleSidebar()" aria-label="Menu">
     <span></span><span></span><span></span>
   </button>
+
+  <!--
+    OVERLAY DA SIDEBAR — Mobile
+    Fundo escurecido exibido atrás da sidebar quando aberta.
+    Clicar nele chama closeSidebar() para fechar.
+    A classe .open é adicionada/removida via JS junto com a sidebar.
+  -->
   <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
-  <!-- API Modal (mobile) -->
+
+  <!--
+    MODAL DE API KEY — Exibido no mobile via botão na topbar
+    A classe .open no .api-modal-bg é gerenciada por openApiModal() / closeApiModal().
+    onclick="event.stopPropagation()" no .api-modal evita fechar ao clicar dentro do card.
+    O listener no .api-modal-bg fecha o modal ao clicar no fundo escuro (tratado também no JS).
+  -->
   <div class="api-modal-bg" id="apiModalBg">
     <div class="api-modal" onclick="event.stopPropagation()">
       <h3>Chave API Groq</h3>
       <p>Crie sua chave gratuita em console.groq.com → API Keys. Fica salva no seu navegador.</p>
+      <!--
+        autocomplete/autocorrect/autocapitalize/spellcheck desabilitados
+        para evitar interferência do browser em campos de chave de API.
+      -->
       <input type="text" class="api-modal-inp" id="apiModalInp" placeholder="gsk_..." autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" />
       <div class="api-modal-row">
         <button class="api-modal-save" onclick="saveKeyModal()">Salvar</button>
@@ -1244,33 +1510,59 @@
     </div>
   </div>
 
-  <!-- SIDEBAR -->
+
+  <!--
+    SIDEBAR — Barra lateral de navegação e configuração
+    onclick="void(0)" no <aside> evita que cliques na sidebar
+    borbulhem e disparem handlers indesejados no documento.
+  -->
   <aside class="sidebar" id="sidebar" onclick="void(0)">
+
+    <!-- Logo e subtítulo da marca -->
     <div class="sidebar-header">
       <div class="logo">Psy<span>IA</span></div>
       <div class="logo-sub">Inteligência em Saúde Mental</div>
     </div>
 
-    <!-- Mode tabs -->
+    <!--
+      ABAS DE MODO — Apoio / Profissional
+      switchTab('support' | 'pro') troca os painéis ativos,
+      os formulários de input e o label da topbar.
+    -->
     <div class="mode-tabs">
       <button type="button" class="mode-tab active" id="tabSupport" onclick="switchTab('support')">🌿 Apoio</button>
       <button type="button" class="mode-tab" id="tabPro" onclick="switchTab('pro')">🧠 Profissional</button>
     </div>
 
-    <!-- Support panel -->
+    <!--
+      PAINEL APOIO — Lista de conversas
+      Populado dinamicamente por renderConvList() no JS.
+      Cada item é gerado com título (40 chars da 1ª mensagem)
+      e meta (data + contagem de mensagens).
+    -->
     <div class="sidebar-panel active" id="panelSupport">
       <button type="button" class="new-conv-btn" onclick="newConversation()">＋ Nova conversa</button>
       <div class="panel-label">Conversas</div>
       <div class="conv-list" id="convList"></div>
     </div>
 
-    <!-- Pro panel -->
+    <!--
+      PAINEL PROFISSIONAL — Lista de pacientes
+      Populado dinamicamente por renderPatientList() no JS.
+      Cada item representa um paciente com nome e data de cadastro.
+    -->
     <div class="sidebar-panel" id="panelPro">
       <button type="button" class="new-patient-btn" onclick="newPatient()">＋ Novo paciente</button>
       <div class="panel-label">Pacientes</div>
       <div class="patient-list" id="patientList"></div>
     </div>
 
+    <!--
+      SEÇÃO DE API KEY — Visível apenas no desktop
+      Em mobile esta seção é ocultada via CSS e substituída
+      pelo modal acessível pelo botão 🔑 na topbar.
+      #apiStatus exibe "Chave salva" (verde) ou "Nenhuma chave salva" (cinza).
+    -->
     <div class="api-section">
       <div class="api-label">Chave API Groq</div>
       <div class="api-input-wrap">
@@ -1279,14 +1571,26 @@
       </div>
       <div class="api-status" id="apiStatus">Nenhuma chave salva</div>
     </div>
+
     <div class="disclaimer">⚠️ Ferramenta de apoio — não substitui diagnóstico clínico.</div>
   </aside>
 
+
+  <!--
+    APP — Container do conteúdo principal
+    Deslocado da sidebar via margin-left: var(--sidebar-w) no desktop.
+    Em mobile o margin-left vai a zero e a sidebar vira drawer.
+  -->
   <div class="app">
-
-
-    <!-- MAIN -->
     <main class="main">
+
+      <!--
+        TOPBAR — Cabeçalho do conteúdo principal
+        Esquerda: ponto pulsante animado + label do modo ativo (#modeLabel).
+        Direita: botão 🔑 API (mobile only) + botão de ação principal.
+        #topbarAction alterna entre "↺ Nova" (Apoio) e "↺ Limpar" (Pro)
+        conforme o modo, via handleTopbarAction().
+      -->
       <div class="topbar">
         <div class="mode-indicator">
           <div class="mode-dot"></div>
@@ -1298,7 +1602,25 @@
         </div>
       </div>
 
+      <!--
+        ÁREA DE CHAT — #chatArea
+        Populada dinamicamente pelo JS:
+          - renderMessage()        → adiciona bolhas de mensagem.
+          - typeMessage()          → efeito typewriter nas respostas da IA.
+          - showLoading()          → três pontos animados enquanto aguarda API.
+          - renderWelcomeSupport() → tela inicial do modo Apoio.
+          - renderWelcomePro()     → tela inicial do modo Profissional.
+        A tela de boas-vindas abaixo é o estado inicial; substituída
+        na primeira mensagem enviada por hideWelcome() + renderMessage().
+      -->
       <div class="chat-area" id="chatArea">
+
+        <!--
+          TELA DE BOAS-VINDAS — Estado inicial do modo Apoio
+          Os .hint-chip chamam sendHint(texto), que preenche o textarea
+          e envia a mensagem automaticamente.
+          Esta div é removida do DOM por hideWelcome() no JS.
+        -->
         <div class="welcome" id="welcomeScreen">
           <div class="welcome-icon">🌿</div>
           <h2>Olá, estou <em>aqui</em> para você</h2>
@@ -1310,9 +1632,23 @@
             <div class="hint-chip" onclick="sendHint('Quero entender melhor meus padrões de comportamento.')">Autoconhecimento</div>
           </div>
         </div>
-      </div>
 
+      </div><!-- /chat-area -->
+
+      <!--
+        WRAPPER DE INPUT — Rodapé fixo
+        Contém dois formulários alternados via JS (display:none/block):
+          1. #simpleInput : modo Apoio  — textarea livre + botão enviar
+          2. #proInput    : modo Pro    — campos estruturados + botão analisar
+      -->
       <div class="input-wrapper">
+
+        <!--
+          MODO APOIO — Input simples
+          onkeydown="handleKey(event)": Enter envia, Shift+Enter nova linha.
+          oninput="autoResize(this)": ajusta a altura do textarea ao conteúdo.
+          O SVG inline é um ícone de avião de papel (path de 24x24).
+        -->
         <div class="simple-input-area" id="simpleInput">
           <div class="simple-row">
             <textarea class="simple-textarea" id="simpleText" placeholder="O que está sentindo?" rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
@@ -1323,6 +1659,16 @@
             </button>
           </div>
         </div>
+
+        <!--
+          MODO PROFISSIONAL — Formulário clínico estruturado
+          Inicialmente oculto (style="display:none"), exibido ao trocar para o modo Pro.
+          Campos:
+            #patientName → nome ou código anonimizado do paciente.
+            #patientAge  → idade e gênero (texto livre).
+            #proText     → relato clínico: sintomas, histórico, queixas.
+          sendPro() compõe uma mensagem em markdown com esses dados e chama a API Groq.
+        -->
         <div class="pro-form" id="proInput" style="display:none">
           <div class="pro-fields">
             <div class="field-group">
@@ -1336,581 +1682,24 @@
           </div>
           <textarea class="pro-textarea" id="proText" placeholder="Descreva sintomas, comportamentos, histórico e queixas clínicas..."></textarea>
           <div class="send-row">
-            <button class="analyze-btn" id="analyzeBtn" onclick="sendPro()">Analisar →</button>
+            <button class="analyze-btn" id="analyzeBtn" onclick="sendPro()">Analisar</button>
           </div>
         </div>
-      </div>
+
+      </div><!-- /input-wrapper -->
+
     </main>
-  </div>
+  </div><!-- /app -->
 
-  <script>
-    // ================================================================
-    // DATA LAYER — persists everything to localStorage
-    // ================================================================
-    const DB = {
-      // conversations: [{id, title, date, messages:[{role,content}]}]
-      // patients: [{id, name, age, date, messages:[{role,content}]}]
-      load (key, def) { try { return JSON.parse(localStorage.getItem(key)) || def } catch (e) { return def } },
-      save (key, val) { try { localStorage.setItem(key, JSON.stringify(val)) } catch (e) { } },
-      convs () { return this.load('psyia_convs', []) },
-      saveConvs (c) { this.save('psyia_convs', c) },
-      patients () { return this.load('psyia_patients', []) },
-      savePatients (p) { this.save('psyia_patients', p) },
-      apiKey () { return localStorage.getItem('psyia_groq_key') || '' },
-      saveKey (k) { localStorage.setItem('psyia_groq_key', k) },
-    }
 
-    // ================================================================
-    // APP STATE
-    // ================================================================
-    let currentTab = 'support'       // 'support' | 'pro'
-    let currentConvId = null         // active conversation id
-    let currentPatientId = null      // active patient id
-    let isLoading = false
-    let apiKey = DB.apiKey()
+  <!--
+    SCRIPT PRINCIPAL
+    Toda a lógica JS está em psyia.js, documentada com JSDoc.
+    Colocado no fim do <body> para garantir que o DOM esteja
+    pronto antes de init() ser chamado.
+  -->
+  <script src="psyia.js"></script>
 
-    // ================================================================
-    // INIT
-    // ================================================================
-    function init () {
-      // API key
-      if (apiKey) {
-        document.getElementById('apiKeyInput').value = apiKey
-        setApiStatus(true)
-      }
-
-      renderConvList()
-      renderPatientList()
-
-      // Load last active conversation
-      const convs = DB.convs()
-      if (convs.length > 0) {
-        loadConversation(convs[ 0 ].id)
-      }
-
-      setupSwipe()
-    }
-
-    // ================================================================
-    // API KEY
-    // ================================================================
-    function setApiStatus (ok) {
-      const s = document.getElementById('apiStatus')
-      s.textContent = ok ? '✓ Chave salva' : 'Nenhuma chave salva'
-      s.className = 'api-status' + (ok ? ' ok' : '')
-      const btn = document.getElementById('topbarApiBtn')
-      if (btn) btn.textContent = ok ? '✓ API' : '🔑 API'
-    }
-    function saveKey () {
-      const v = document.getElementById('apiKeyInput').value.trim()
-      if (!v) return
-      apiKey = v; DB.saveKey(v); setApiStatus(true); closeSidebar()
-    }
-    function openApiModal () {
-      document.getElementById('apiModalInp').value = apiKey
-      document.getElementById('apiModalBg').classList.add('open')
-      setTimeout(() => document.getElementById('apiModalInp').focus(), 120)
-    }
-    function closeApiModal () { document.getElementById('apiModalBg').classList.remove('open') }
-    function saveKeyModal () {
-      const v = document.getElementById('apiModalInp').value.trim()
-      if (!v) return
-      apiKey = v; DB.saveKey(v)
-      document.getElementById('apiKeyInput').value = v
-      setApiStatus(true); closeApiModal()
-    }
-    document.getElementById('apiModalBg').addEventListener('click', function (e) {
-      if (e.target === this) closeApiModal()
-    })
-
-    // ================================================================
-    // SIDEBAR / MOBILE
-    // ================================================================
-    function toggleSidebar () { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('open') }
-    function openSidebar () { document.getElementById('sidebar').classList.add('open'); document.getElementById('sidebarOverlay').classList.add('open') }
-    function closeSidebar () { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('open') }
-
-    function setupSwipe () {
-      let sx = 0, sy = 0, track = false
-      const sb = document.getElementById('sidebar')
-      document.addEventListener('touchstart', e => {
-        sx = e.touches[ 0 ].clientX; sy = e.touches[ 0 ].clientY
-        track = sx < 28 || sb.classList.contains('open')
-      }, { passive: true })
-      document.addEventListener('touchend', e => {
-        if (!track) return
-        const dx = e.changedTouches[ 0 ].clientX - sx
-        const dy = Math.abs(e.changedTouches[ 0 ].clientY - sy)
-        if (dy > 55) return
-        if (dx > 45 && !sb.classList.contains('open')) openSidebar()
-        else if (dx < -45 && sb.classList.contains('open')) closeSidebar()
-      }, { passive: true })
-    }
-
-    // ================================================================
-    // TAB SWITCHING
-    // ================================================================
-    function switchTab (tab) {
-      currentTab = tab
-      document.getElementById('tabSupport').classList.toggle('active', tab === 'support')
-      document.getElementById('tabPro').classList.toggle('active', tab === 'pro')
-      document.getElementById('panelSupport').classList.toggle('active', tab === 'support')
-      document.getElementById('panelPro').classList.toggle('active', tab === 'pro')
-      document.getElementById('simpleInput').style.display = tab === 'support' ? 'block' : 'none'
-      document.getElementById('proInput').style.display = tab === 'pro' ? 'block' : 'none'
-      document.getElementById('modeLabel').textContent = tab === 'support' ? 'Apoio Emocional' : 'Modo Profissional'
-      document.getElementById('topbarAction').textContent = tab === 'support' ? '↺ Nova' : '↺ Limpar'
-
-      if (tab === 'support') {
-        const convs = DB.convs()
-        if (convs.length > 0 && currentConvId) loadConversation(currentConvId)
-        else if (convs.length > 0) loadConversation(convs[ 0 ].id)
-        else renderWelcomeSupport()
-      } else {
-        if (currentPatientId) loadPatient(currentPatientId)
-        else renderWelcomePro()
-      }
-      closeSidebar()
-    }
-
-    function handleTopbarAction () {
-      if (currentTab === 'support') newConversation()
-      else clearPatientChat()
-    }
-
-    // ================================================================
-    // SUPPORT — CONVERSATIONS
-    // ================================================================
-    function newConversation () {
-      const convs = DB.convs()
-      // Find ANY empty conversation, not just the top one
-      const emptyConv = convs.find(c => c.messages.length === 0)
-      if (emptyConv) {
-        currentConvId = emptyConv.id
-        renderConvList()
-        renderWelcomeSupport()
-        closeSidebar()
-        return
-      }
-      // All existing convs have messages — create a new empty one
-      const id = 'conv_' + Date.now()
-      convs.unshift({ id, title: 'Nova conversa', date: new Date().toLocaleDateString('pt-BR'), messages: [] })
-      DB.saveConvs(convs)
-      currentConvId = id
-      renderConvList()
-      renderWelcomeSupport()
-      closeSidebar()
-    }
-
-    function loadConversation (id) {
-      const convs = DB.convs()
-      const conv = convs.find(c => c.id === id)
-      if (!conv) return
-      currentConvId = id
-      renderConvList()
-
-      const area = document.getElementById('chatArea')
-      area.innerHTML = ''
-      if (conv.messages.length === 0) {
-        renderWelcomeSupport()
-      } else {
-        conv.messages.forEach(m => renderMessage(m.role === 'user' ? 'user' : 'ai', m.content))
-        setTimeout(() => { area.scrollTop = area.scrollHeight }, 50)
-      }
-      closeSidebar()
-    }
-
-    function deleteConversation (id, e) {
-      e.stopPropagation()
-      let convs = DB.convs()
-      convs = convs.filter(c => c.id !== id)
-      DB.saveConvs(convs)
-      if (currentConvId === id) {
-        currentConvId = null
-        if (convs.length > 0) loadConversation(convs[ 0 ].id)
-        else renderWelcomeSupport()
-      }
-      renderConvList()
-    }
-
-    function renderConvList () {
-      const convs = DB.convs()
-      const el = document.getElementById('convList')
-      if (convs.length === 0) {
-        el.innerHTML = '<div style="padding:12px;font-size:10px;color:rgba(245,240,232,0.25);text-align:center">Nenhuma conversa ainda</div>'
-        return
-      }
-      el.innerHTML = convs.map(c => `
-    <div class="conv-item ${c.id === currentConvId ? 'active' : ''}" onclick="loadConversation('${c.id}')">
-      <button class="conv-item-delete" onclick="deleteConversation('${c.id}',event)">×</button>
-      <div class="conv-item-title">${escHtml(c.title)}</div>
-      <div class="conv-item-meta">${c.date} · ${c.messages.length} msgs</div>
-    </div>`).join('')
-    }
-
-    function saveCurrentConv (messages) {
-      if (!currentConvId) return
-      const convs = DB.convs()
-      const idx = convs.findIndex(c => c.id === currentConvId)
-      if (idx === -1) return
-      convs[ idx ].messages = messages
-      // Auto-title from first user message
-      const firstUser = messages.find(m => m.role === 'user')
-      if (firstUser && convs[ idx ].title === 'Nova conversa') {
-        convs[ idx ].title = firstUser.content.slice(0, 40) + (firstUser.content.length > 40 ? '…' : '')
-      }
-      DB.saveConvs(convs)
-      renderConvList()
-    }
-
-    // ================================================================
-    // PRO — PATIENTS
-    // ================================================================
-    function newPatient () {
-      // If current patient has no messages, just show welcome — don't create another
-      if (currentPatientId) {
-        const patients = DB.patients()
-        const current = patients.find(p => p.id === currentPatientId)
-        if (current && current.messages.length === 0) {
-          renderWelcomePro(current.name)
-          closeSidebar()
-          return
-        }
-      }
-      const name = prompt('Nome ou código do paciente:')
-      if (!name || !name.trim()) return
-      const id = 'pat_' + Date.now()
-      const patients = DB.patients()
-      patients.unshift({ id, name: name.trim(), age: '', date: new Date().toLocaleDateString('pt-BR'), messages: [] })
-      DB.savePatients(patients)
-      currentPatientId = id
-      renderPatientList()
-      renderWelcomePro()
-      closeSidebar()
-    }
-
-    function loadPatient (id) {
-      const patients = DB.patients()
-      const pat = patients.find(p => p.id === id)
-      if (!pat) return
-      currentPatientId = id
-      renderPatientList()
-
-      const area = document.getElementById('chatArea')
-      area.innerHTML = ''
-      if (pat.messages.length === 0) {
-        renderWelcomePro(pat.name)
-      } else {
-        pat.messages.forEach(m => renderMessage(m.role === 'user' ? 'user' : 'ai', m.content))
-        setTimeout(() => { area.scrollTop = area.scrollHeight }, 50)
-      }
-      closeSidebar()
-    }
-
-    function deletePatient (id, e) {
-      e.stopPropagation()
-      if (!confirm('Excluir este paciente e todo seu histórico?')) return
-      let patients = DB.patients().filter(p => p.id !== id)
-      DB.savePatients(patients)
-      if (currentPatientId === id) {
-        currentPatientId = null
-        renderWelcomePro()
-      }
-      renderPatientList()
-    }
-
-    function clearPatientChat () {
-      if (!currentPatientId) return
-      if (!confirm('Limpar o histórico deste paciente?')) return
-      const patients = DB.patients()
-      const idx = patients.findIndex(p => p.id === currentPatientId)
-      if (idx === -1) return
-      patients[ idx ].messages = []
-      DB.savePatients(patients)
-      renderWelcomePro(patients[ idx ].name)
-    }
-
-    function renderPatientList () {
-      const patients = DB.patients()
-      const el = document.getElementById('patientList')
-      if (patients.length === 0) {
-        el.innerHTML = '<div style="padding:12px;font-size:10px;color:rgba(245,240,232,0.25);text-align:center">Nenhum paciente ainda</div>'
-        return
-      }
-      el.innerHTML = patients.map(p => `
-    <div class="patient-item ${p.id === currentPatientId ? 'active' : ''}" onclick="loadPatient('${p.id}')">
-      <button class="patient-delete" onclick="deletePatient('${p.id}',event)">×</button>
-      <div class="patient-name">${escHtml(p.name)}</div>
-      <div class="patient-meta">${p.date} · ${p.messages.length} msgs</div>
-    </div>`).join('')
-    }
-
-    function saveCurrentPatient (messages) {
-      if (!currentPatientId) return
-      const patients = DB.patients()
-      const idx = patients.findIndex(p => p.id === currentPatientId)
-      if (idx === -1) return
-      patients[ idx ].messages = messages
-      DB.savePatients(patients)
-      renderPatientList()
-    }
-
-    // ================================================================
-    // WELCOME SCREENS
-    // ================================================================
-    function renderWelcomeSupport () {
-      document.getElementById('chatArea').innerHTML = `
-    <div class="welcome" id="welcomeScreen">
-      <div class="welcome-icon">🌿</div>
-      <h2>Olá, estou <em>aqui</em> para você</h2>
-      <p>Um espaço seguro para conversar, refletir e encontrar clareza. Como você está se sentindo hoje?</p>
-      <div class="welcome-hints">
-        <div class="hint-chip" onclick="sendHint('Estou me sentindo ansioso e não sei o motivo.')">Ansiedade</div>
-        <div class="hint-chip" onclick="sendHint('Preciso de ajuda para lidar com a tristeza.')">Tristeza</div>
-        <div class="hint-chip" onclick="sendHint('Tenho dificuldade em me relacionar com pessoas.')">Relacionamentos</div>
-        <div class="hint-chip" onclick="sendHint('Quero entender melhor meus padrões de comportamento.')">Autoconhecimento</div>
-      </div>
-    </div>`
-    }
-
-    function renderWelcomePro (name) {
-      const n = name ? `Paciente: <em>${escHtml(name)}</em>` : 'Modo <em>Profissional</em>'
-      document.getElementById('chatArea').innerHTML = `
-    <div class="welcome" id="welcomeScreen">
-      <div class="welcome-icon">🧠</div>
-      <h2>${n}</h2>
-      <p>${name ? 'Insira informações clínicas abaixo para iniciar a análise.' : 'Selecione ou crie um paciente na barra lateral para começar.'}</p>
-      ${!name ? '' : `<div class="welcome-hints"><div class="hint-chip" onclick="fillExample()">Carregar exemplo</div></div>`}
-    </div>`
-    }
-
-    function fillExample () {
-      document.getElementById('patientName').value = 'Paciente M.'
-      document.getElementById('patientAge').value = '29 anos, feminino'
-      document.getElementById('proText').value = 'Episódios de tristeza profunda há 6 meses, perda de interesse em atividades antes prazerosas, insônia de manutenção, fadiga constante e pensamentos negativos sobre o futuro. Nega ideação suicida. Histórico de ansiedade na adolescência. Isolamento social progressivo em home office.'
-    }
-
-    // ================================================================
-    // RENDER HELPERS
-    // ================================================================
-    function hideWelcome () { document.getElementById('welcomeScreen')?.remove() }
-
-    function renderMessage (role, content) {
-      const area = document.getElementById('chatArea')
-      const div = document.createElement('div')
-      div.className = `message ${role}`
-      const av = role === 'ai' ? `<div class="avatar ai">🌿</div>` : `<div class="avatar user-av">👤</div>`
-      div.innerHTML = `${av}<div class="bubble">${fmt(content)}</div>`
-      area.appendChild(div)
-      area.scrollTop = area.scrollHeight
-      return div
-    }
-
-    function fmt (text) {
-      return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>')
-        .split('\n\n').filter(p => p.trim()).map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('')
-    }
-
-    function escHtml (s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;') }
-
-    function showLoading () {
-      hideWelcome()
-      const area = document.getElementById('chatArea')
-      const div = document.createElement('div')
-      div.className = 'message ai'; div.id = 'loadingMsg'
-      div.innerHTML = `<div class="avatar ai">🌿</div><div class="bubble"><div class="loading-dots"><span></span><span></span><span></span></div></div>`
-      area.appendChild(div); area.scrollTop = area.scrollHeight
-    }
-    function removeLoading () { document.getElementById('loadingMsg')?.remove() }
-
-    function showError (msg) {
-      const t = document.createElement('div')
-      t.className = 'error-toast'; t.textContent = msg
-      document.body.appendChild(t); setTimeout(() => t.remove(), 5000)
-    }
-
-    const sleep = ms => new Promise(r => setTimeout(r, ms))
-
-    // ================================================================
-    // TYPING EFFECT
-    // ================================================================
-    async function typeMessage (text) {
-      hideWelcome()
-      const area = document.getElementById('chatArea')
-      const wrap = document.createElement('div'); wrap.className = 'message ai'
-      const bubble = document.createElement('div'); bubble.className = 'bubble'
-      wrap.innerHTML = `<div class="avatar ai">🌿</div>`
-      wrap.appendChild(bubble); area.appendChild(wrap)
-      const cursor = document.createElement('span'); cursor.className = 'typing-cursor'
-      const tokens = text.split(/(\s+)/)
-      let displayed = ''
-      for (const token of tokens) {
-        displayed += token
-        bubble.innerHTML = fmt(displayed); bubble.appendChild(cursor)
-        area.scrollTop = area.scrollHeight
-        let d = 42
-        if (/[.!?…]/.test(token)) d = 220
-        else if (/[,;:—]/.test(token)) d = 100
-        else if (/^\s+$/.test(token)) d = 8
-        else if (token.length > 8) d = 56
-        await sleep(d)
-      }
-      cursor.remove(); bubble.innerHTML = fmt(text); area.scrollTop = area.scrollHeight
-    }
-
-    // ================================================================
-    // INPUT HELPERS
-    // ================================================================
-    function autoResize (el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px' }
-    function handleKey (e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendSupport() } }
-    function setLoading (v) {
-      isLoading = v;
-      [ 'sendBtn', 'analyzeBtn' ].forEach(id => { const el = document.getElementById(id); if (el) el.disabled = v })
-    }
-
-    // ================================================================
-    // SEND — SUPPORT
-    // ================================================================
-    let supportMessages = [] // current in-memory messages for active conv
-
-    async function sendSupport () {
-      if (isLoading) return
-      const el = document.getElementById('simpleText')
-      const text = el.value.trim()
-      if (!text) return
-      if (!apiKey) { showError('⚠️ Insira sua chave API (botão 🔑 ou barra lateral)'); return }
-
-      // Ensure there's an active conversation
-      if (!currentConvId) newConversation()
-
-      el.value = ''; el.style.height = 'auto'
-      hideWelcome()
-      renderMessage('user', text)
-
-      // Load current messages from DB and append
-      const convs = DB.convs()
-      const conv = convs.find(c => c.id === currentConvId)
-      const messages = conv ? [ ...conv.messages ] : []
-      messages.push({ role: 'user', content: text })
-      saveCurrentConv(messages) // save immediately (user msg)
-
-      setLoading(true); showLoading()
-      try {
-        const reply = await callGroq(messages, 'support')
-        removeLoading()
-        await typeMessage(reply)
-        messages.push({ role: 'assistant', content: reply })
-        saveCurrentConv(messages) // save after AI responds
-      } catch (e) { removeLoading(); showError('Erro: ' + e.message) }
-      setLoading(false)
-    }
-
-    function sendHint (text) { document.getElementById('simpleText').value = text; sendSupport() }
-
-    // ================================================================
-    // SEND — PRO
-    // ================================================================
-    async function sendPro () {
-      if (isLoading) return
-      const name = document.getElementById('patientName').value.trim()
-      const age = document.getElementById('patientAge').value.trim()
-      const notes = document.getElementById('proText').value.trim()
-      if (!notes) return
-      if (!apiKey) { showError('⚠️ Insira sua chave API (botão 🔑 ou barra lateral)'); return }
-
-      // Ensure patient exists
-      if (!currentPatientId) {
-        const n = name || 'Paciente'
-        const id = 'pat_' + Date.now()
-        const patients = DB.patients()
-        patients.unshift({ id, name: n, age: age || '', date: new Date().toLocaleDateString('pt-BR'), messages: [] })
-        DB.savePatients(patients)
-        currentPatientId = id
-        renderPatientList()
-      } else if (name) {
-        // Update patient name/age if provided
-        const patients = DB.patients()
-        const idx = patients.findIndex(p => p.id === currentPatientId)
-        if (idx !== -1) { patients[ idx ].name = name; if (age) patients[ idx ].age = age; DB.savePatients(patients); renderPatientList() }
-      }
-
-      const userMsg = `**Paciente:** ${name || 'Não informado'} | **Perfil:** ${age || 'Não informado'}\n\n**Relato Clínico:**\n${notes}`
-      document.getElementById('proText').value = ''
-      document.getElementById('patientName').value = ''
-      document.getElementById('patientAge').value = ''
-      hideWelcome()
-      renderMessage('user', userMsg)
-
-      const patients = DB.patients()
-      const pat = patients.find(p => p.id === currentPatientId)
-      const messages = pat ? [ ...pat.messages ] : []
-      messages.push({ role: 'user', content: userMsg })
-      saveCurrentPatient(messages)
-
-      setLoading(true); showLoading()
-      try {
-        const reply = await callGroq(messages, 'pro')
-        removeLoading()
-        await typeMessage(reply)
-        messages.push({ role: 'assistant', content: reply })
-        saveCurrentPatient(messages)
-      } catch (e) { removeLoading(); showError('Erro: ' + e.message) }
-      setLoading(false)
-    }
-
-    // ================================================================
-    // GROQ API
-    // ================================================================
-    async function callGroq (msgs, mode) {
-      const systemSupport = `Você é PsyIA — uma presença calorosa, empática e profundamente humana, especializada em saúde mental e bem-estar emocional.
-
-Você é como um amigo de muita confiança que também entende profundamente de psicologia, do coração humano e de como o corpo e a mente funcionam. Você se importa de verdade com cada pessoa.
-
-ESTRUTURA DE CADA RESPOSTA:
-
-Parágrafo 1 — ACOLHIMENTO GENUÍNO
-Reconheça e valide o sentimento com calor real e específico para aquele momento.
-
-Parágrafo 2 — PRESENÇA E PROFUNDIDADE
-Reflita algo sobre o que a pessoa está vivendo que vai além do óbvio.
-
-Parágrafo 3 — SUGESTÃO NATURAL E ACOLHEDORA
-Ofereça 1 ou 2 sugestões práticas e gentis de forma poética e humana — nunca como lista. Pense em coisas que o corpo e a mente precisam naquele momento: pausar, respirar, tomar água, se mover, sentir o presente, escrever, conversar com alguém.
-
-Parágrafo 4 — CONVITE CALOROSO
-Termine com um convite suave: "me conta mais...", "estou aqui...", "quando quiser continuar...".
-
-CUIDADOS: sem listas com bullets, sem ser genérico, emojis com moderação (máx 1), português brasileiro fluido e caloroso, 3-5 parágrafos separados.`
-
-      const systemPro = `Você é PsyIA Pro, ferramenta de apoio à análise clínica para psicólogos habilitados.
-
-Apresente análise estruturada com:
-**1. Hipóteses Diagnósticas** — DSM-5/CID-11 por probabilidade com justificativa breve.
-**2. Análise dos Sintomas** — padrões, duração, intensidade, etiologia.
-**3. Fatores de Risco e Atenção** — comorbidades, cronicidade, pontos críticos.
-**4. Abordagens Terapêuticas** — linhas teóricas e intervenções recomendadas.
-**5. Avaliações Complementares** — instrumentos e encaminhamentos úteis.
-
-Português técnico e preciso. Finalize reforçando que é ferramenta de apoio — não substitui o julgamento clínico.`
-
-      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-        body: JSON.stringify({
-          model: 'llama-3.3-70b-versatile',
-          messages: [ { role: 'system', content: mode === 'support' ? systemSupport : systemPro }, ...msgs ],
-          max_tokens: 850, temperature: mode === 'support' ? 0.80 : 0.28
-        })
-      })
-      if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.error?.message || `HTTP ${res.status}`) }
-      return (await res.json()).choices[ 0 ].message.content
-    }
-
-    // ================================================================
-    // START
-    // ================================================================
-    init();
-  </script>
 </body>
 
 </html>
