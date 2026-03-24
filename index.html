@@ -2,203 +2,2364 @@
 <html lang="pt-BR">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Felipe Dev</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="./assets/css/style.css">
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <link rel="icon" href="./assets/img/availability-svgrepo-com.svg" type="image/x-icon">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Felipe Navarro — Analista de T.I</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <!-- Favicon placeholder -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>" />
+
+    <style>
+        /* ==========================================
+           VARIÁVEIS & RESET
+        ========================================== */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #06090f;
+            --bg2: #0a0f1a;
+            --bg3: #0f1623;
+            --surface: #111c2d;
+            --surface2: #162035;
+            --border: rgba(99, 179, 237, 0.12);
+            --border2: rgba(99, 179, 237, 0.22);
+            --accent: #63b3ed;
+            --accent2: #68d391;
+            --accent3: #b794f4;
+            --accent4: #f6ad55;
+            --text: #e8edf5;
+            --text2: #8fa3bd;
+            --text3: #3d5268;
+            --glow: rgba(99, 179, 237, 0.15);
+            --radius: 16px;
+            --radius-sm: 8px;
+            --radius-xs: 5px;
+            --ease: cubic-bezier(.4, 0, .2, 1);
+            --font-display: 'Outfit', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-display);
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.65;
+            overflow-x: hidden;
+        }
+
+        /* Scrollbar customizada */
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(var(--accent), var(--accent3));
+            border-radius: 99px;
+        }
+
+        /* Grade de fundo sutil */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(99, 179, 237, .025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 179, 237, .025) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ==========================================
+           NAVEGAÇÃO
+        ========================================== */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 clamp(1.25rem, 5vw, 4rem);
+            height: 66px;
+            background: rgba(6, 9, 15, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            transition: box-shadow .3s var(--ease);
+        }
+
+        nav.scrolled {
+            box-shadow: 0 4px 40px rgba(0, 0, 0, .6);
+        }
+
+        .nav-logo {
+            font-family: var(--font-display);
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: var(--text);
+            text-decoration: none;
+            letter-spacing: -.02em;
+            display: flex;
+            align-items: center;
+            gap: .3rem;
+        }
+
+        .nav-logo .dot {
+            color: var(--accent);
+            font-size: 1.5rem;
+            line-height: 0;
+            vertical-align: middle;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text2);
+            text-decoration: none;
+            font-size: .875rem;
+            font-weight: 500;
+            letter-spacing: .02em;
+            transition: color .25s var(--ease);
+            position: relative;
+            padding-bottom: 2px;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--accent);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform .25s var(--ease);
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        .nav-links a:hover::after {
+            transform: scaleX(1);
+        }
+
+        .nav-cta {
+            background: transparent !important;
+            border: 1px solid var(--border2) !important;
+            color: var(--accent) !important;
+            padding: .38rem 1rem;
+            border-radius: var(--radius-xs);
+            font-weight: 600 !important;
+            font-size: .82rem !important;
+            transition: background .25s, border-color .25s !important;
+        }
+
+        .nav-cta:hover {
+            background: rgba(99, 179, 237, .08) !important;
+            border-color: var(--accent) !important;
+        }
+
+        .nav-cta::after {
+            display: none !important;
+        }
+
+        /* Hamburger mobile */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 22px;
+            height: 2px;
+            background: var(--accent);
+            border-radius: 2px;
+            transition: .25s var(--ease);
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 66px;
+            left: 0;
+            right: 0;
+            background: rgba(6, 9, 15, .98);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            z-index: 199;
+            padding: 1.5rem 2rem;
+            flex-direction: column;
+            gap: .25rem;
+        }
+
+        .mobile-menu.open {
+            display: flex;
+        }
+
+        .mobile-menu a {
+            color: var(--text2);
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 500;
+            padding: .75rem 0;
+            border-bottom: 1px solid var(--border);
+            transition: color .2s;
+        }
+
+        .mobile-menu a:last-child {
+            border-bottom: none;
+        }
+
+        .mobile-menu a:hover {
+            color: var(--accent);
+        }
+
+        /* ==========================================
+           HERO — com foto
+        ========================================== */
+        .hero {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            gap: 3rem;
+            padding: 8rem clamp(1.25rem, 7vw, 6rem) 5rem;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        /* Glow decorativo à direita */
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: 10%;
+            right: -8%;
+            width: 55vw;
+            height: 55vw;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(99, 179, 237, .07) 0%, transparent 65%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .hero-glow-bottom {
+            position: absolute;
+            bottom: 5%;
+            left: -5%;
+            width: 40vw;
+            height: 40vw;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(104, 211, 145, .05) 0%, transparent 65%);
+            pointer-events: none;
+        }
+
+        .hero-content {
+            max-width: 680px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Badge animado */
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: .55rem;
+            background: rgba(99, 179, 237, .08);
+            border: 1px solid rgba(99, 179, 237, .2);
+            color: var(--accent);
+            padding: .38rem 1rem;
+            border-radius: 99px;
+            font-size: .73rem;
+            font-weight: 600;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            margin-bottom: 1.75rem;
+            animation: fadeSlideUp .6s ease both;
+        }
+
+        .hero-badge .pulse-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--accent2);
+            animation: pulseDot 2s infinite;
+        }
+
+        @keyframes pulseDot {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: .4;
+                transform: scale(.75);
+            }
+        }
+
+        .hero-name {
+            font-family: var(--font-display);
+            font-size: clamp(3rem, 7vw, 5.5rem);
+            font-weight: 900;
+            line-height: 1.0;
+            letter-spacing: -.04em;
+            margin-bottom: .5rem;
+            animation: fadeSlideUp .6s .1s ease both;
+        }
+
+        .hero-name .accent-blue {
+            color: var(--accent);
+        }
+
+        .hero-tagline {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: .5rem;
+            margin-bottom: 1.5rem;
+            font-family: var(--font-mono);
+            font-size: clamp(.75rem, 1.4vw, .88rem);
+            color: var(--text2);
+            animation: fadeSlideUp .6s .2s ease both;
+        }
+
+        .hero-tagline .sep {
+            color: var(--text3);
+        }
+
+        .hero-tagline .hi {
+            color: var(--accent2);
+            font-weight: 600;
+        }
+
+        .hero-desc {
+            font-size: clamp(.92rem, 1.4vw, 1.02rem);
+            color: var(--text2);
+            max-width: 540px;
+            line-height: 1.8;
+            margin-bottom: 2.5rem;
+            animation: fadeSlideUp .6s .3s ease both;
+        }
+
+        .hero-desc strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            animation: fadeSlideUp .6s .4s ease both;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            background: var(--accent);
+            color: var(--bg);
+            padding: .8rem 1.9rem;
+            border-radius: var(--radius-sm);
+            font-weight: 700;
+            font-size: .95rem;
+            text-decoration: none;
+            letter-spacing: .01em;
+            transition: transform .25s, box-shadow .25s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, .12);
+            transform: translateX(-101%);
+            transition: transform .3s var(--ease);
+        }
+
+        .btn-primary:hover::before {
+            transform: translateX(0);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(99, 179, 237, .28);
+        }
+
+        .btn-ghost {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            border: 1px solid var(--border2);
+            color: var(--text);
+            padding: .8rem 1.75rem;
+            border-radius: var(--radius-sm);
+            font-weight: 500;
+            font-size: .95rem;
+            text-decoration: none;
+            transition: .25s var(--ease);
+            background: transparent;
+        }
+
+        .btn-ghost:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        /* Estatísticas no hero */
+        .hero-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2.5rem;
+            margin-top: 3.5rem;
+            padding-top: 2.5rem;
+            border-top: 1px solid var(--border);
+            animation: fadeSlideUp .6s .5s ease both;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            gap: .1rem;
+        }
+
+        .stat-number {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--accent);
+            line-height: 1;
+            letter-spacing: -.03em;
+        }
+
+        .stat-label {
+            font-size: .72rem;
+            color: var(--text3);
+            font-weight: 500;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+        }
+
+        /* ==========================================
+           FOTO DO HERO — estilo editorial
+        ========================================== */
+        .hero-photo-wrap {
+            position: relative;
+            z-index: 2;
+            flex-shrink: 0;
+            animation: fadeSlideUp .8s .3s ease both;
+        }
+
+        /* Moldura com gradiente + glow */
+        .hero-photo-frame {
+            position: relative;
+            width: clamp(220px, 22vw, 320px);
+            aspect-ratio: 3/4;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        /* Borda gradiente animada */
+        .hero-photo-frame::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 22px;
+            background: linear-gradient(135deg, var(--accent), var(--accent3), var(--accent2));
+            z-index: -1;
+            animation: borderGlow 4s ease infinite alternate;
+        }
+
+        @keyframes borderGlow {
+            0% {
+                opacity: .55;
+            }
+
+            100% {
+                opacity: .95;
+            }
+        }
+
+        .hero-photo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center top;
+            display: block;
+            border-radius: 18px;
+        }
+
+        /* Reflexo inferior suave */
+        .hero-photo-frame::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 35%;
+            background: linear-gradient(to top, rgba(6, 9, 15, .65), transparent);
+            pointer-events: none;
+            border-radius: 0 0 18px 18px;
+        }
+
+        /* Badge de nome sobre a foto */
+        .photo-name-tag {
+            position: absolute;
+            bottom: 14px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(6, 9, 15, .85);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border2);
+            border-radius: var(--radius-sm);
+            padding: .45rem 1.1rem;
+            white-space: nowrap;
+            z-index: 3;
+            text-align: center;
+        }
+
+        .photo-name-tag strong {
+            display: block;
+            font-size: .82rem;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: .01em;
+        }
+
+        .photo-name-tag span {
+            font-family: var(--font-mono);
+            font-size: .64rem;
+            color: var(--accent);
+            letter-spacing: .05em;
+        }
+
+        /* Ponto verde "online" */
+        .online-dot {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            z-index: 3;
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+            background: rgba(6, 9, 15, .8);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(104, 211, 145, .25);
+            border-radius: 99px;
+            padding: .25rem .65rem;
+            font-size: .62rem;
+            font-weight: 600;
+            color: var(--accent2);
+            letter-spacing: .06em;
+            text-transform: uppercase;
+        }
+
+        .online-dot::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent2);
+            animation: pulseDot 2s infinite;
+        }
+
+        /* ==========================================
+           SEÇÃO BASE
+        ========================================== */
+        section {
+            padding: 5.5rem clamp(1.25rem, 7vw, 6rem);
+            position: relative;
+            z-index: 1;
+        }
+
+        .section-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: .6rem;
+            color: var(--accent);
+            font-family: var(--font-mono);
+            font-size: .73rem;
+            font-weight: 500;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            margin-bottom: .9rem;
+        }
+
+        .section-eyebrow::before {
+            content: '';
+            display: block;
+            width: 20px;
+            height: 1px;
+            background: var(--accent);
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: clamp(1.9rem, 4vw, 3rem);
+            font-weight: 900;
+            line-height: 1.1;
+            letter-spacing: -.03em;
+            margin-bottom: 1.2rem;
+        }
+
+        .section-subtitle {
+            color: var(--text2);
+            font-size: 1rem;
+            max-width: 540px;
+            line-height: 1.75;
+            margin-bottom: 3.5rem;
+        }
+
+        .section-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 0 clamp(1.25rem, 7vw, 6rem);
+        }
+
+        /* ==========================================
+           SOBRE
+        ========================================== */
+        #sobre {
+            background: var(--bg2);
+        }
+
+        .sobre-grid {
+            display: grid;
+            grid-template-columns: minmax(260px, 340px) 1fr;
+            gap: 4rem;
+            align-items: start;
+        }
+
+        .card-perfil {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2rem 1.75rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-perfil::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
+        }
+
+        /* Avatar com iniciais */
+        .avatar {
+            width: 86px;
+            height: 86px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent3) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-size: 1.85rem;
+            font-weight: 900;
+            color: var(--bg);
+            margin-bottom: 1.25rem;
+            box-shadow: 0 0 0 4px rgba(99, 179, 237, .15);
+        }
+
+        .card-perfil h3 {
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            font-weight: 800;
+            letter-spacing: -.02em;
+            margin-bottom: .2rem;
+        }
+
+        .card-perfil .role-badge {
+            display: inline-block;
+            background: rgba(99, 179, 237, .1);
+            border: 1px solid rgba(99, 179, 237, .2);
+            color: var(--accent);
+            padding: .25rem .65rem;
+            border-radius: var(--radius-xs);
+            font-family: var(--font-mono);
+            font-size: .7rem;
+            font-weight: 500;
+            letter-spacing: .04em;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: .8rem;
+        }
+
+        .info-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: .8rem;
+            font-size: .855rem;
+            color: var(--text2);
+            line-height: 1.4;
+        }
+
+        .info-list .ico {
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
+            background: rgba(99, 179, 237, .08);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .85rem;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .info-list a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .info-list a:hover {
+            text-decoration: underline;
+        }
+
+        .sobre-body p {
+            color: var(--text2);
+            line-height: 1.85;
+            margin-bottom: 1.25rem;
+            font-size: .98rem;
+        }
+
+        .sobre-body p strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .sobre-body p:last-child {
+            margin-bottom: 0;
+        }
+
+        .destaque-quote {
+            background: rgba(99, 179, 237, .06);
+            border: 1px solid rgba(99, 179, 237, .18);
+            border-left: 3px solid var(--accent);
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            padding: 1.1rem 1.4rem;
+            margin-top: 1.75rem;
+            font-family: var(--font-mono);
+            font-size: .82rem;
+            color: var(--text2);
+            line-height: 1.7;
+            font-style: italic;
+        }
+
+        /* ==========================================
+           HABILIDADES
+        ========================================== */
+        #habilidades {
+            background: var(--bg);
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .skill-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            transition: transform .25s var(--ease), border-color .25s, box-shadow .25s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .skill-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 0%, rgba(99, 179, 237, .06), transparent 70%);
+            opacity: 0;
+            transition: opacity .3s;
+        }
+
+        .skill-card:hover {
+            border-color: var(--border2);
+            transform: translateY(-4px);
+            box-shadow: 0 14px 44px rgba(0, 0, 0, .3);
+        }
+
+        .skill-card:hover::after {
+            opacity: 1;
+        }
+
+        .skill-head {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            margin-bottom: 1.1rem;
+        }
+
+        .skill-ico {
+            width: 38px;
+            height: 38px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .skill-ico.blue {
+            background: rgba(99, 179, 237, .1);
+            border: 1px solid rgba(99, 179, 237, .18);
+        }
+
+        .skill-ico.green {
+            background: rgba(104, 211, 145, .1);
+            border: 1px solid rgba(104, 211, 145, .18);
+        }
+
+        .skill-ico.purple {
+            background: rgba(183, 148, 244, .1);
+            border: 1px solid rgba(183, 148, 244, .18);
+        }
+
+        .skill-ico.orange {
+            background: rgba(246, 173, 85, .1);
+            border: 1px solid rgba(246, 173, 85, .18);
+        }
+
+        .skill-name {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: .98rem;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .4rem;
+        }
+
+        .tag {
+            padding: .22rem .6rem;
+            border-radius: 4px;
+            font-family: var(--font-mono);
+            font-size: .7rem;
+            font-weight: 500;
+            letter-spacing: .03em;
+        }
+
+        .tag.blue {
+            background: rgba(99, 179, 237, .08);
+            border: 1px solid rgba(99, 179, 237, .15);
+            color: var(--accent);
+        }
+
+        .tag.green {
+            background: rgba(104, 211, 145, .08);
+            border: 1px solid rgba(104, 211, 145, .15);
+            color: var(--accent2);
+        }
+
+        .tag.purple {
+            background: rgba(183, 148, 244, .08);
+            border: 1px solid rgba(183, 148, 244, .15);
+            color: var(--accent3);
+        }
+
+        .tag.orange {
+            background: rgba(246, 173, 85, .08);
+            border: 1px solid rgba(246, 173, 85, .15);
+            color: var(--accent4);
+        }
+
+        /* Diferenciais */
+        .diferenciais-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1.1rem;
+            margin-top: 4rem;
+        }
+
+        .dif-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.25rem 1.1rem;
+            display: flex;
+            align-items: flex-start;
+            gap: .9rem;
+            transition: .25s var(--ease);
+        }
+
+        .dif-item:hover {
+            border-color: rgba(104, 211, 145, .3);
+            transform: translateY(-3px);
+        }
+
+        .dif-ico {
+            width: 38px;
+            height: 38px;
+            border-radius: 9px;
+            background: rgba(104, 211, 145, .08);
+            border: 1px solid rgba(104, 211, 145, .15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .dif-item h4 {
+            font-family: var(--font-display);
+            font-size: .9rem;
+            font-weight: 700;
+            margin-bottom: .3rem;
+        }
+
+        .dif-item p {
+            font-size: .8rem;
+            color: var(--text2);
+            line-height: 1.6;
+        }
+
+        /* ==========================================
+           PROJETOS
+        ========================================== */
+        #projetos {
+            background: var(--bg2);
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 1.75rem;
+        }
+
+        /* Projeto destaque: ocupa todas as colunas */
+        .project-card.featured {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: 1.15fr 1fr;
+        }
+
+        .project-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            transition: transform .3s var(--ease), border-color .3s, box-shadow .3s;
+            position: relative;
+        }
+
+        .project-card:hover {
+            border-color: rgba(99, 179, 237, .38);
+            transform: translateY(-5px);
+            box-shadow: 0 24px 64px rgba(0, 0, 0, .4), 0 0 50px rgba(99, 179, 237, .06);
+        }
+
+        /* Borda superior no projeto destaque */
+        .project-card.featured::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            z-index: 3;
+            background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
+        }
+
+        /* Thumbnail do projeto */
+        .proj-thumb {
+            background: var(--bg3);
+            position: relative;
+            overflow: hidden;
+            min-height: 220px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .project-card.featured .proj-thumb {
+            min-height: 100%;
+        }
+
+        /*
+         * Imagem do projeto: object-fit contain garante que
+         * qualquer screenshot, independente de resolução, caiba
+         * sem cortar nem distorcer.
+         */
+        .proj-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center;
+            position: absolute;
+            inset: 0;
+            padding: 1rem;
+            transition: transform .4s var(--ease);
+        }
+
+        .project-card:hover .proj-thumb img {
+            transform: scale(1.03);
+        }
+
+        /* Placeholder quando não há imagem */
+        .proj-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: .75rem;
+            padding: 2.5rem;
+            width: 100%;
+            min-height: 220px;
+        }
+
+        .proj-placeholder .big-icon {
+            font-size: 3.5rem;
+            line-height: 1;
+        }
+
+        .proj-placeholder span {
+            color: var(--text3);
+            font-family: var(--font-mono);
+            font-size: .72rem;
+            text-align: center;
+        }
+
+        .proj-badge {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            z-index: 2;
+            background: var(--accent);
+            color: var(--bg);
+            padding: .22rem .65rem;
+            border-radius: 4px;
+            font-family: var(--font-mono);
+            font-size: .67rem;
+            font-weight: 700;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+        }
+
+        .proj-badge.new {
+            background: var(--accent2);
+        }
+
+        /* Corpo do card de projeto */
+        .proj-body {
+            padding: 1.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: .8rem;
+        }
+
+        .project-card.featured .proj-body {
+            padding: 2.5rem;
+            justify-content: center;
+        }
+
+        .proj-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .4rem;
+        }
+
+        .proj-tag {
+            background: rgba(99, 179, 237, .07);
+            border: 1px solid rgba(99, 179, 237, .15);
+            color: var(--accent);
+            padding: .18rem .55rem;
+            border-radius: 4px;
+            font-family: var(--font-mono);
+            font-size: .67rem;
+            font-weight: 600;
+            letter-spacing: .04em;
+        }
+
+        .proj-title {
+            font-family: var(--font-display);
+            font-size: 1.15rem;
+            font-weight: 800;
+            line-height: 1.25;
+            color: var(--text);
+        }
+
+        .project-card.featured .proj-title {
+            font-size: 1.55rem;
+        }
+
+        .proj-desc {
+            color: var(--text2);
+            font-size: .875rem;
+            line-height: 1.75;
+        }
+
+        .proj-footer {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: .5rem;
+            flex-wrap: wrap;
+        }
+
+        .proj-link {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            color: var(--accent);
+            text-decoration: none;
+            font-size: .85rem;
+            font-weight: 600;
+            transition: gap .2s, color .2s;
+        }
+
+        .proj-link:hover {
+            color: #93c5fd;
+            gap: .65rem;
+        }
+
+        .proj-link-sec {
+            color: var(--text2);
+            text-decoration: none;
+            font-size: .82rem;
+            font-weight: 500;
+            transition: color .2s;
+        }
+
+        .proj-link-sec:hover {
+            color: var(--text);
+        }
+
+        /* ==========================================
+           CONTATO
+        ========================================== */
+        #contato {
+            background: var(--bg);
+        }
+
+        .contato-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3.5rem;
+            align-items: start;
+        }
+
+        .contact-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .contact-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.2rem 1.5rem;
+            text-decoration: none;
+            color: var(--text);
+            transition: .25s var(--ease);
+        }
+
+        .contact-card:hover {
+            border-color: rgba(99, 179, 237, .38);
+            transform: translateX(6px);
+            box-shadow: -3px 0 0 var(--accent);
+        }
+
+        .contact-card-ico {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background: rgba(99, 179, 237, .08);
+            border: 1px solid rgba(99, 179, 237, .18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+            flex-shrink: 0;
+        }
+
+        .contact-card strong {
+            display: block;
+            font-weight: 600;
+            font-size: .92rem;
+            margin-bottom: .1rem;
+        }
+
+        .contact-card span {
+            font-size: .8rem;
+            color: var(--text2);
+        }
+
+        /* Formulário de contato */
+        .contact-form {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2.25rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .contact-form::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent3), var(--accent), var(--accent2));
+        }
+
+        .contact-form h3 {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: .4rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            font-size: .78rem;
+            font-weight: 600;
+            color: var(--text2);
+            letter-spacing: .04em;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: .72rem 1rem;
+            color: var(--text);
+            font-family: var(--font-display);
+            font-size: .88rem;
+            outline: none;
+            transition: border-color .2s;
+            width: 100%;
+            resize: vertical;
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: var(--text3);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: var(--accent);
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+        }
+
+        .form-btn {
+            width: 100%;
+            background: var(--accent);
+            color: var(--bg);
+            border: none;
+            padding: .85rem;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-display);
+            font-weight: 800;
+            font-size: .95rem;
+            cursor: pointer;
+            transition: .25s var(--ease);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: .5rem;
+        }
+
+        .form-btn:hover {
+            background: #90cdf4;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(99, 179, 237, .3);
+        }
+
+        /* ==========================================
+           FOOTER
+        ========================================== */
+        footer {
+            background: var(--bg2);
+            border-top: 1px solid var(--border);
+            padding: 2.25rem clamp(1.25rem, 7vw, 6rem);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-logo {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: var(--text);
+            letter-spacing: -.02em;
+        }
+
+        .footer-logo .dot {
+            color: var(--accent);
+        }
+
+        footer p {
+            color: var(--text3);
+            font-size: .78rem;
+        }
+
+        .footer-socials {
+            display: flex;
+            gap: .6rem;
+        }
+
+        .soc-link {
+            width: 34px;
+            height: 34px;
+            border-radius: 7px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .95rem;
+            text-decoration: none;
+            transition: .22s var(--ease);
+        }
+
+        .soc-link:hover {
+            border-color: var(--accent);
+            background: rgba(99, 179, 237, .1);
+            transform: translateY(-3px);
+        }
+
+        /* ==========================================
+           SCROLL REVEAL
+        ========================================== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity .65s var(--ease), transform .65s var(--ease);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal.delay-1 {
+            transition-delay: .1s;
+        }
+
+        .reveal.delay-2 {
+            transition-delay: .2s;
+        }
+
+        .reveal.delay-3 {
+            transition-delay: .3s;
+        }
+
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(22px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ==========================================
+           RESPONSIVO
+        ========================================== */
+        @media (max-width: 1100px) {
+            .hero {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .hero-photo-wrap {
+                order: -1;
+                display: flex;
+                justify-content: center;
+            }
+
+            .hero-photo-frame {
+                width: clamp(160px, 45vw, 260px);
+                aspect-ratio: 1/1;
+            }
+
+            .hero-photo-frame img {
+                object-position: center top;
+            }
+        }
+
+        @media (max-width: 960px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .sobre-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .project-card.featured {
+                grid-column: auto;
+                grid-template-columns: 1fr;
+            }
+
+            .project-card.featured .proj-thumb {
+                min-height: 220px;
+            }
+
+            .contato-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .skills-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .diferenciais-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-stats {
+                gap: 1.5rem;
+            }
+
+            footer {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 400px) {
+            section {
+                padding: 4rem 1.1rem;
+            }
+
+            .hero {
+                padding: 7rem 1.1rem 4rem;
+            }
+        }
+    </style>
 </head>
 
 <body>
-    <header>
-        <h1 data-aos="fade-up" data-aos-duration="1500">Felipe Silva Navarro</h1>
-        <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
-            <div class="container">
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-                    <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="nav-link" href="#sobre">Sobre mim</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#habilidades">Habilidades</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#projetos">Projetos</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#contato">Contato</a>
-                        </li>
-                    </ul>
+
+    <!-- ==================== NAVEGAÇÃO ==================== -->
+    <nav id="navbar">
+        <a href="#home" class="nav-logo">Felipe<span class="dot">·</span>dev</a>
+        <ul class="nav-links">
+            <li><a href="#sobre">Sobre</a></li>
+            <li><a href="#habilidades">Habilidades</a></li>
+            <li><a href="#projetos">Projetos</a></li>
+            <li><a href="#contato">Contato</a></li>
+            <li><a href="https://linkedin.com/in/felipe-navarro-9b033a199" target="_blank" class="nav-cta">LinkedIn ↗</a></li>
+        </ul>
+        <div class="hamburger" id="hamburger">
+            <span></span><span></span><span></span>
+        </div>
+    </nav>
+
+    <!-- Menu mobile -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="#sobre">Sobre</a>
+        <a href="#habilidades">Habilidades</a>
+        <a href="#projetos">Projetos</a>
+        <a href="#contato">Contato</a>
+        <a href="https://linkedin.com/in/felipe-navarro-9b033a199" target="_blank">LinkedIn ↗</a>
+    </div>
+
+
+    <!-- ==================== HERO ==================== -->
+    <section class="hero" id="home">
+        <div class="hero-glow-bottom"></div>
+
+        <!-- Conteúdo textual do hero -->
+        <div class="hero-content">
+
+            <div class="hero-badge">
+                <span class="pulse-dot"></span>
+                Disponível para novas oportunidades
+            </div>
+
+            <h1 class="hero-name">
+                Felipe<br><span class="accent-blue">Navarro</span>
+            </h1>
+
+            <div class="hero-tagline">
+                <span>DevOps em Formação</span>
+                <span class="sep">·</span>
+                <span>Analista de T.I</span>
+                <span class="sep">·</span>
+                <span class="hi">Apaixonado por Tecnologia</span>
+            </div>
+
+            <p class="hero-desc">
+                Desde cedo, tecnologia não era hobbie — era destino.
+                Autodidata por natureza, com absorção de conhecimento acima da média e
+                uma capacidade genuína de <strong>resolver problemas reais</strong>.
+                Trabalho em infraestrutura, redes e automação com o mesmo cuidado
+                de quem entende o sistema de ponta a ponta.
+            </p>
+
+            <div class="hero-actions">
+                <a href="#projetos" class="btn-primary">Ver Projetos →</a>
+                <a href="#contato" class="btn-ghost">Entrar em Contato</a>
+            </div>
+
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number">5+</span>
+                    <span class="stat-label">Anos em T.I</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">∞</span>
+                    <span class="stat-label">Vontade de aprender</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">24/7</span>
+                    <span class="stat-label">Modo T.i ativo</span>
                 </div>
             </div>
-        </nav>
-    </header>
-    <main>
-        <section id="sobre" class="sobre">
-            <div class="container">
-                <div class="row align-items-center">
-                    <div class="col-lg-5 order-lg-1 order-2">
-                        <img src="./assets/img/Eu.png" alt="Foto de Felipe" class="sobre-img img-fluid mb-4 mb-lg-0" data-aos="fade-up" data-aos-duration="3000" style="max-width: 100%; margin: 0 auto;">
-                    </div>
-                    <div class="col-lg-7 order-lg-2 order-1">
-                        <div data-aos="fade-up" data-aos-duration="1500">
-                            <h2 class="text-center mb-4 mt-4 mt-lg-0">Sobre mim</h2>
-                            <p class="text-center text-lg-start">
-                                Profissional de Tecnologia da Informação com formação em Análise e Desenvolvimento de Sistemas pela UNOPAR, tenho experiência na área desde 2022.
-                                <br>
-                                Sempre fui um amante da tecnologia e novos conhecimentos desta área.
-                                <br><br>
-                                Atualmente, trabalho como Assistente de TI no Palato Supermercado, lidando com infraestrutura, suporte a usuários e manutenção de sistemas internos.
-                                <br><br>
-                                Busco me especializar em programação, atualmente tenho habilidades em Java, HTML, CSS, JS, Bootstrap, MongoDB, BD, MySQL, GIT. Destaco-me na resolução de problemas e trabalho em equipe.
-                                <br><br>
-                                Estou sempre disposto a aprender e aprimorar minhas competências técnicas e interpessoais.
-                            </p>
-                        </div>
-                    </div>
+        </div>
+
+        <!--
+            FOTO DO HERO
+            Arquivo: ./assets/img/Eu_formal.PNG
+            Para trocar a foto, basta alterar o atributo src abaixo.
+        -->
+        <div class="hero-photo-wrap">
+            <div class="hero-photo-frame">
+                <span class="online-dot">Open to work</span>
+                <img src="./assets/img/Eu.png" alt="Felipe Navarro — Analista de T.I" loading="eager" />
+                <div class="photo-name-tag">
+                    <strong>Felipe Navarro</strong>
+                    <span>Analista de T.I</span>
                 </div>
             </div>
-        </section>
-        <section id="habilidades" class="habilidades">
-            <div class="container">
-                <h2 data-aos="fade-up" data-aos-duration="1500" class="text-center text-break mb-4 mt-4 mt-lg-0" style="max-width: 100%; overflow-wrap: break-word;">
-                    Minhas habilidades
-                </h2>
-                <div class="row" data-aos="flip-right" data-aos-duration="1700">
-                    <div class="col-lg-4 mb-4">
-                        <div class="habilidade-item text-center">
-                            <img src="./assets/img/JavaScript-logo.png" alt="Ícone do JavaScript" class="fade-in-image">
-                            <p>
-                                No momento estou aprendendo JS pela Udemy, confesso que estou gostando muito de toda a arquitetura da linguagem, possuo alguns projetos em JS que você pode conferir na seção "Meus projetos".
-                            </p>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 mb-4">
-                        <div class="habilidade-item text-center">
-                            <img src="./assets/img/java.png" alt="Ícone do Java" class="fade-in-image">
-                            <p>
-                                Em 2021 fiz um curso de Java que foi onde comecei a estudar programação. Gosto da linguagem e vez ou outra uso, também possuo alguns projetos em Java que você pode conferir na seção "Meus projetos".
-                            </p>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 mb-4">
-                        <div class="habilidade-item text-center">
-                            <img src="./assets/img/mySql.png" alt="Ícone do MySQL" class="fade-in-image">
-                            <p>
-                                No curso de Java também aprendi MySQL. Não sou especializado, mas conheço todas as operações de um banco de dados. Ainda não tenho projetos exclusivos em MySQL.
-                            </p>
-                        </div>
-                    </div>
-                </div>
+        </div>
+
+    </section>
+
+
+    <!-- ==================== SOBRE ==================== -->
+    <section id="sobre">
+        <div class="section-eyebrow">Quem sou</div>
+        <h2 class="section-title">Sobre mim</h2>
+
+        <div class="sobre-grid">
+
+            <!-- Card de perfil lateral -->
+            <div class="card-perfil reveal">
+                <div class="avatar">FN</div>
+                <h3>Felipe Silva Navarro</h3>
+                <span class="role-badge">Analista T.I · Helpdesk · Infra</span>
+                <ul class="info-list">
+                    <li>
+                        <div class="ico">📍</div>
+                        <span>Maceió, Alagoas — Brasil</span>
+                    </li>
+                    <li>
+                        <div class="ico">🎓</div>
+                        <span>Análise e Des. de Sistemas — UNOPAR</span>
+                    </li>
+                    <li>
+                        <div class="ico">💼</div>
+                        <span>Aberto a CLT · PJ · Remoto</span>
+                    </li>
+                    <li>
+                        <div class="ico">🐙</div>
+                        <span><a href="https://github.com/FelipeSilvaNavarro" target="_blank">github.com/FelipeSilvaNavarro</a></span>
+                    </li>
+                    <li>
+                        <div class="ico">💼</div>
+                        <span><a href="https://linkedin.com/in/felipe-navarro-9b033a199" target="_blank">LinkedIn</a></span>
+                    </li>
+                </ul>
             </div>
-        </section>
-        <section id="projetos" class="projetos">
-            <div class="container">
-                <h2 data-aos="fade-up" data-aos-duration="1500" class="text-center text-break tw-bold mb-4 mt-4 mt-lg-0" style="max-width: 100%; overflow-wrap: break-word;">
-                    Meus projetos
-                </h2>
-                <p data-aos="fade-up" data-aos-duration="1700">
-                    Bem-vindo ao meu portfólio. <br>Aqui você encontrará uma seleção dos meus melhores projetos e trabalhos.
+
+            <!-- Texto biográfico -->
+            <div class="sobre-body reveal delay-1">
+                <p>
+                    A tecnologia sempre esteve presente na minha vida e desde então nunca saiu.
+                    Fui aquele garoto que desmontava tudo com curiosidade genuína, e que,
+                    mais tarde, transformou essa curiosidade em carreira.
+                    <br>
+                    Sou comunicativo por natureza, aprendo rápido,
+                    me adapto a novos ambientes com facilidade e tenho um drive natural
+                    para ir fundo nos problemas até encontrar a solução.
                 </p>
-                <div class="row row-cols-1 row-cols-md-2 g-4">
-                    <div class="col mb-4">
-                        <div class="projeto-item">
-                            <h3>Agenda</h3>
-                            <img src="./assets/img/Agenda.jpg" alt="Computador com a tela de agenda aberta, apresentando uma lista de contatos para o usuário" class="projeto-imagem img-fluid mx-auto">
-                            <p>Aplicação de um CRUD feito em JS, utilizando MVC (Controllers, Models, Views) e verificação de dados no propio front-end, views feito em EJS para suportar códigos
-                                <br>
-                                Deploy feito com o google cloud plataform, e o proxy reverso do NGINX para subir para o subdominio do site
-                                <br>
-                                Projeto feito juntamente com o professor do curso de JS e baseado nos meus conhecimentos iniciais do curso, irá ser incluido melhorias e personalizações.
-                                <br>
-                                Proteções usadas: CSRF e HTTPS
-                                <br>
-                                As atualizações deste projeto irão vir com futuras implementações
-                            </p>
-                            <a href="//www.youtube.com" target="_blank">Video explicativo</a>
-                            <a href="https://app.navarrodev.com.br" target="_blank">Ver projeto</a>
-                        </div>
-                    </div>
-                    <div class="col mb-4">
-                        <div class="projeto-item">
-                            <h3>Calculador de IMC</h3>
-                            <img src="./assets/img/calculador IMC.jpg" alt="Imagem de uma tableta IMC, destacando um calculador de IMC com interface amigável e fácil de usar" class="projeto-imagem img-fluid mx-auto">
-                            <p>Aplicação que permite ao usuario calcular o Índice de Massa Corporal (IMC) de forma precisa e rápida, ajudando na monitoração da saúde e do bem-estar físico.
-                                <br>
-                                As atualizações deste projeto irão vir com futuras implementações
-                            </p>
-                            <a href="https://www.youtube.com/watch?v=ChDeB6xpNF0" target="_blank">Video explicativo</a>
-                            <a href="./meusProjetos/calculadoraIMC/index.html" target="_blank">Ver projeto</a>
-                        </div>
-                    </div>
+                <p>
+                    Tenho experiência prática com <strong>infraestrutura, suporte técnico,
+                        redes, virtualização e automação</strong>. Atualmente trabalho como
+                    Assistente de T.I no Palato Supermercado, onde cuido da infraestrutura,
+                    suporte a usuários e manutenção de sistemas internos, sempre com atenção
+                    ao detalhe e comprometimento com a operação.
+                </p>
+                <p>
+                    Sou formado em <strong>Análise e Desenvolvimento de Sistemas</strong> e
+                    atualmente curso pós-graduação em <strong>DevOps</strong>, consolidando
+                    uma base sólida entre teoria e prática. Busco evoluir continuamente em
+                    automação, infraestrutura e cloud, aplicando conceitos modernos no dia a dia.
+                </p>
+                <p>
+                    Tenho habilidades em <strong>Java, JavaScript, Python, HTML/CSS, MySQL,
+                        MongoDB, Bootstrap e Git</strong>. Gosto de colocar a mão na massa,
+                    entender o sistema de ponta a ponta e construir coisas que funcionam de verdade,
+                    do terminal ao browser. Quando o ambiente te dá controle total sobre o que
+                    acontece por baixo dos panos, é onde me sinto completamente em casa.
+                </p>
+                <p>
+                    Fora do trabalho, continuo estudando, documentação, labs, projetos pessoais,
+                    porque acredito que quem para de aprender, para de crescer.
+                    Destaco-me na resolução de problemas e no trabalho em equipe,
+                    sempre disposto a compartilhar o que sei.
+                </p>
+                <div class="destaque-quote">
+                    "Tecnologia não é só o que eu faço — é como eu penso.
+                    Sempre fui aquele cara que aprende uma coisa nova, vai mais fundo,
+                    e logo está ensinando os outros."
+                </div>
+            </div>
+        </div>
+    </section>
 
-                    <div class="col mb-4">
-                        <div class="projeto-item">
-                            <h3>Lista de tarefas</h3>
-                            <img src="./assets/img/listaDeTarefas.jpg" alt="Captura de tela de uma lista de tarefas, exibindo itens organizados e prontos para serem concluídos" class="projeto-imagem img-fluid mx-auto">
-                            <p>Aplicação que permite a criação, visualização e gerenciamento de tarefas. Baseado nos conhecimentos iniciais do curso de JS, irá ser incluidoo melhorias e personalizações.
-                                <br>
-                                As atualizações deste projeto irão vir com futuras implementações
-                            </p>
-                            <a href="//www.youtube.com/watch?v=38R2UZx6tJI&t=11s" target="_blank">Video explicativo</a>
-                            <a href="./meusProjetos/listaDeTarefas/index.html" target="_blank">Ver projeto</a>
-                        </div>
+    <div class="section-divider"></div>
+
+
+    <!-- ==================== HABILIDADES ==================== -->
+    <section id="habilidades">
+        <div class="section-eyebrow">Stack &amp; Skills</div>
+        <h2 class="section-title">Habilidades &amp; Destaques</h2>
+        <p class="section-subtitle">
+            Tecnologias que uso no dia a dia, ferramentas que domino e as áreas onde me destaco.
+        </p>
+
+        <div class="skills-grid">
+
+            <!-- Cloud e Redes -->
+            <div class="skill-card reveal">
+                <div class="skill-head">
+                    <div class="skill-ico blue">☁️</div>
+                    <span class="skill-name">Cloud &amp; Redes</span>
+                </div>
+                <div class="tags">
+                    <span class="tag blue">Proxmox VE</span>
+                    <span class="tag blue">VPN</span>
+                    <span class="tag blue">TCP/IP</span>
+                    <span class="tag blue">DNS / DHCP</span>
+                    <span class="tag blue">Firewall</span>
+                </div>
+            </div>
+
+            <!-- Sistemas e Suporte -->
+            <div class="skill-card reveal delay-1">
+                <div class="skill-head">
+                    <div class="skill-ico purple">💻</div>
+                    <span class="skill-name">Sistemas &amp; Suporte</span>
+                </div>
+                <div class="tags">
+                    <span class="tag purple">Windows Server</span>
+                    <span class="tag purple">Active Directory</span>
+                    <span class="tag purple">Helpdesk N1/N2</span>
+                    <span class="tag purple">ITSM</span>
+                    <span class="tag purple">Virtualização</span>
+                </div>
+            </div>
+
+            <!-- Ambiente Unix/Linux -->
+            <div class="skill-card reveal delay-2">
+                <div class="skill-head">
+                    <div class="skill-ico orange">🖥️</div>
+                    <span class="skill-name">Ambiente Unix/Linux</span>
+                </div>
+                <div class="tags">
+                    <span class="tag orange">Terminal</span>
+                    <span class="tag orange">Bash</span>
+                    <span class="tag orange">Shell Script</span>
+                    <span class="tag orange">Cron jobs</span>
+                    <span class="tag orange">Permissões</span>
+                    <span class="tag orange">Systemd</span>
+                </div>
+            </div>
+
+            <!-- Desenvolvimento -->
+            <div class="skill-card reveal">
+                <div class="skill-head">
+                    <div class="skill-ico green">🧑‍💻</div>
+                    <span class="skill-name">Desenvolvimento</span>
+                </div>
+                <div class="tags">
+                    <span class="tag green">Java</span>
+                    <span class="tag green">JavaScript</span>
+                    <span class="tag green">Python</span>
+                    <span class="tag green">HTML5 / CSS3</span>
+                    <span class="tag green">MySQL</span>
+                    <span class="tag green">MongoDB</span>
+                    <span class="tag green">Git / GitHub</span>
+                </div>
+            </div>
+
+            <!-- Automação e CI/CD -->
+            <div class="skill-card reveal delay-1">
+                <div class="skill-head">
+                    <div class="skill-ico blue">⚙️</div>
+                    <span class="skill-name">Automação &amp; CI/CD</span>
+                </div>
+                <div class="tags">
+                    <span class="tag blue">GitHub Actions</span>
+                    <span class="tag blue">Pipeline</span>
+                    <span class="tag blue">Shell Script</span>
+                    <span class="tag blue">NGINX</span>
+                    <span class="tag blue">GCP</span>
+                </div>
+            </div>
+
+            <!-- Ferramentas -->
+            <div class="skill-card reveal delay-2">
+                <div class="skill-head">
+                    <div class="skill-ico purple">🔧</div>
+                    <span class="skill-name">Ferramentas</span>
+                </div>
+                <div class="tags">
+                    <span class="tag purple">VS Code</span>
+                    <span class="tag purple">IntelliJ IDEA</span>
+                    <span class="tag purple">Postman</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- O que me diferencia -->
+        <h3 style="font-family:var(--font-display);font-size:clamp(1.3rem,3vw,1.85rem);font-weight:900;letter-spacing:-.025em;margin-top:4rem;margin-bottom:.5rem;">
+            O que me diferencia
+        </h3>
+
+        <div class="diferenciais-grid">
+
+            <div class="dif-item reveal">
+                <div class="dif-ico">🧠</div>
+                <div>
+                    <h4>Base Técnica Sólida</h4>
+                    <p>Busco entender como as tecnologias funcionam por dentro. Estudo fundamentos de sistemas, redes e computação para resolver problemas com mais eficiência.</p>
+                </div>
+            </div>
+
+            <div class="dif-item reveal delay-1">
+                <div class="dif-ico">🛠️</div>
+                <div>
+                    <h4>Resolução de Problemas</h4>
+                    <p>Facilidade em diagnosticar e resolver problemas técnicos, analisando causa raiz em vez de apenas aplicar soluções rápidas.</p>
+                </div>
+            </div>
+
+            <div class="dif-item reveal delay-2">
+                <div class="dif-ico">🖥️</div>
+                <div>
+                    <h4>Visão de Infraestrutura</h4>
+                    <p>Entendo a tecnologia de forma integrada: hardware, sistema operacional, virtualização, rede e aplicações trabalhando juntas.</p>
+                </div>
+            </div>
+
+            <div class="dif-item reveal">
+                <div class="dif-ico">🖥️</div>
+                <div>
+                    <h4>Conhecimento em Hardware</h4>
+                    <p>Diagnóstico, montagem e troubleshooting de computadores e servidores. Entendo o funcionamento do hardware até a camada de sistema.</p>
+                </div>
+            </div>
+            <div class="dif-item reveal delay-3">
+                <div class="dif-ico">💬</div>
+                <div>
+                    <h4>Comunicação Técnica</h4>
+                    <p>Consigo explicar conceitos técnicos de forma clara para usuários e equipes, facilitando suporte, documentação e colaboração.</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+
+    <!-- ==================== PROJETOS ==================== -->
+    <section id="projetos">
+        <div class="section-eyebrow">Trabalhos em destaque</div>
+        <h2 class="section-title">Projetos</h2>
+        <p class="section-subtitle">
+            Projetos técnicos focados em aprendizado prático, experimentação e construção de ambientes reais de infraestrutura.
+        </p>
+
+        <div class="projects-grid">
+
+            <!--
+                PROJETO DESTAQUE
+                Para trocar a imagem: substitua src abaixo pelo caminho do seu screenshot.
+                A imagem usa object-fit:contain — qualquer resolução cabe sem cortar.
+            -->
+            <div class="project-card featured reveal">
+                <div class="proj-thumb">
+                    <img src="./assets/img/AD/W2012_SERVER Rodando.png" alt="Ambiente Corporativo no Proxmox" />
+                    <span class="proj-badge">Destaque</span>
+                </div>
+                <div class="proj-body">
+                    <div class="proj-tags">
+                        <span class="proj-tag">Proxmox</span>
+                        <span class="proj-tag">Windows Server</span>
+                        <span class="proj-tag">Active Directory</span>
+                        <span class="proj-tag">Infraestrutura</span>
+                    </div>
+                    <h3 class="proj-title" style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;">
+                        <img src="./assets/img/proxmox.webp" alt="Proxmox" style="height:28px;width:auto;object-fit:contain;flex-shrink:0;" />
+                        Ambiente Corporativo no Proxmox
+                    </h3>
+                    <p class="proj-desc">
+                        Ambiente virtualizado completo montado do zero no Proxmox: Windows Server 2012,
+                        Active Directory, DHCP, DNS e GPO configurados como em um ambiente corporativo real.
+                        Um lab que vai além da teoria — tudo funcional e documentado.
+                    </p>
+                    <div class="proj-footer">
+                        <a href="https://www.linkedin.com/posts/felipe-navarro-9b033a199_finalizei-um-projeto-que-me-foi-dado-como-activity-7442190256357076992-xpmm?utm_source=share&utm_medium=member_desktop&rcm=ACoAAC6AcBQBQEmduvc8dsFpjBQKuDgYy4HKYgY" target="_blank" class="proj-link">
+                            Sobre o projeto →
+                        </a>
+                        <!--
+                            Quando tiver o post no LinkedIn, descomente e preencha o link:
+                            <a href="SEU_LINK_LINKEDIN" target="_blank" class="proj-link-sec">Post no LinkedIn ↗</a>
+                        -->
                     </div>
                 </div>
             </div>
-        </section>
 
-    </main>
+            <!--
+                PROJETO 2 — Sistema de Acesso e Cadastro
+                Para adicionar imagem: substitua o bloco .proj-placeholder por <img src="..." alt="...">
+           
+            <div class="project-card reveal">
+                <div class="proj-thumb">
+                    <div class="proj-placeholder">
+                        <span class="big-icon">🔐</span>
+                        <span>Adicione imagem do projeto</span>
+                    </div>
+                </div>
+                <div class="proj-body">
+                    <div class="proj-tags">
+                        <span class="proj-tag">Java</span>
+                        <span class="proj-tag">Autenticação</span>
+                    </div>
+                    <h3 class="proj-title">Sistema de Acesso e Cadastro</h3>
+                    <p class="proj-desc">
+                        Sistema de autenticação e gerenciamento de usuários em Java.
+                        Login seguro, cadastro com validações e controle de sessão.
+                    </p>
+                    <div class="proj-footer">
+                        <a href="https://github.com/FelipeSilvaNavarro/Acesso-Cadastro" target="_blank" class="proj-link">
+                            Ver código →
+                        </a>
+                    </div>
+                </div>
+            </div>
+            -->
+            <!--
+                PROJETO 3 — Agenda CRUD
+                Para adicionar imagem: substitua o bloco .proj-placeholder por <img src="..." alt="...">
+            -->
+            <div class="project-card reveal delay-1">
+                <div class="proj-thumb">
+                    <img src="./assets/img/Agenda.jpg" alt="Sistema de Agenda">
+                </div>
+                <div class="proj-body">
+                    <div class="proj-tags">
+                        <span class="proj-tag">JavaScript</span>
+                        <span class="proj-tag">Node.js</span>
+                        <span class="proj-tag">MVC</span>
+                        <span class="proj-tag">MongoDB</span>
+                    </div>
+                    <h3 class="proj-title">Agenda — CRUD Completo</h3>
+                    <p class="proj-desc">
+                    <p>
+                        Aplicação de um CRUD feito em JS, utilizando MVC (Controllers, Models, Views) e verificação de dados no propio front-end, views feito em EJS para suportar códigos
+                    </p>
+                    <p>
+                        Deploy feito com o google cloud plataform, e o proxy reverso do NGINX para subir para o subdominio do site
+                    </p>
+                    <p>
+                        Projeto feito juntamente com o professor do curso de JS e baseado nos meus conhecimentos iniciais do curso.
+                    </p>
+                    <p>
+                        Proteções usadas: CSRF e HTTPS
+                    </p>
+                    </p>
+                    <div class="proj-footer">
+                        <!-- Link temporariamente desativado - domínio fora do ar
+                        <a href="https://app.navarrodev.com.br" target="_blank" class="proj-link">Ver projeto →</a>
+                        -->
+                    </div>
+                </div>
+            </div>
+
+            <!--
+                PROJETO 4 — Jogo da Cobra
+                Para adicionar imagem: substitua o bloco .proj-placeholder por <img src="..." alt="...">
+            
+
+            <div class="project-card reveal delay-2">
+                <div class="proj-thumb">
+                    <div class="proj-placeholder">
+                        <span class="big-icon">🐍</span>
+                        <span>Adicione imagem do projeto</span>
+                    </div>
+                </div>
+                <div class="proj-body">
+                    <div class="proj-tags">
+                        <span class="proj-tag">Java</span>
+                        <span class="proj-tag">Game Dev</span>
+                    </div>
+                    <h3 class="proj-title">Jogo da Cobra</h3>
+                    <p class="proj-desc">
+                        Clássico Snake desenvolvido em Java com interface gráfica — demonstra
+                        lógica de programação, manipulação de eventos e renderização.
+                    </p>
+                    <div class="proj-footer">
+                        <a href="https://github.com/FelipeSilvaNavarro/JogoDaCobra" target="_blank" class="proj-link">
+                            Ver código →
+                        </a>
+                    </div>
+                </div>
+            </div>
+            -->
+            <div class="project-card reveal">
+                <div class="proj-thumb">
+                    <img src="/assets/img/Proxmox/PiHole rodando o dia.png" alt="Nome do Projeto" />
+                    <div class="proj-placeholder">
+                    </div>
+                </div>
+                <div class="proj-body">
+                    <div class="proj-tags">
+                        <span class="proj-tag">Proxmox</span>
+                        <span class="proj-tag">Pi-hole</span>
+                        <span class="proj-tag">DNS</span>
+                        <span class="proj-tag">Linux</span>
+                        <span class="proj-tag">Virtualização</span>
+                    </div>
+                    <h3 class="proj-title">Pi-hole</h3>
+                    <p class="proj-desc">
+                    <p>
+                        Servidor DNS com Pi-hole implementado em máquina virtual no Proxmox para
+                        bloqueio de anúncios e rastreadores a nível de rede. O ambiente faz parte
+                        do meu homelab de infraestrutura, onde experimento virtualização, serviços
+                        de rede e monitoramento de tráfego. O projeto permite estudar controle DNS,
+                        listas de bloqueio, resolução de nomes e integração com a rede local.
+                    </p>
+                    </p>
+                    <div class="proj-footer">
+                        <a href="https://www.linkedin.com/posts/felipe-navarro-9b033a199_comecei-a-usar-o-pi-hole-para-filtrar-an%C3%BAncios-activity-7438252546944724992-EBId?utm_source=share&utm_medium=member_desktop&rcm=ACoAAC6AcBQBQEmduvc8dsFpjBQKuDgYy4HKYgY" target="_blank" class="proj-link">Sobre o projeto →</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card reveal">
+
+                <div class="proj-thumb">
+                    <img src="/assets/img/PsyIA.png" alt="PsyIA" />
+                    <div class="proj-placeholder"></div>
+                </div>
+
+                <div class="proj-body">
+
+                    <div class="proj-tags">
+                        <span class="proj-tag">JavaScript</span>
+                        <span class="proj-tag">LLM</span>
+                        <span class="proj-tag">Groq API</span>
+                        <span class="proj-tag">Llama 3</span>
+                        <span class="proj-tag">Frontend</span>
+                        <span class="proj-tag">AI</span>
+                    </div>
+
+                    <h3 class="proj-title">PsyIA</h3>
+
+                    <p class="proj-desc">
+                    <p>
+                        Aplicação web de interface conversacional com IA voltada para apoio emocional
+                        e análise psicológica. A plataforma possui dois modos: um chat empático para
+                        conversas reflexivas e um modo profissional que gera análises clínicas
+                        estruturadas utilizando modelos LLM via API da Groq.
+                    </p>
+
+                    <p>
+                        O projeto explora integração com inteligência artificial, arquitetura
+                        frontend sem backend e persistência de dados no navegador usando
+                        LocalStorage.
+                    </p>
+
+                    <div class="proj-footer" style="flex-direction:column;align-items:flex-start;gap:.5rem;">
+                        <a href="https://github.com/FelipeSilvaNavarro/sitePessoal/tree/main/meusProjetos/psyIA" target="_blank" class="proj-link">Ver código →</a>
+                        <a href="https://navarrodev.com.br/meusProjetos/psyIA/index.html" target="_blank" class="proj-link">Ver projeto →</a>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="project-card reveal">
+                <div class="proj-thumb">
+                    <img src="./assets/img/Proxmox/ProxMox Windows 11 finalmente.png" alt="">
+                </div>
+                <div class="proj-body">
+
+                    <div class="proj-tags">
+                        <span class="proj-tag">Proxmox</span>
+                        <span class="proj-tag">Virtualização</span>
+                        <span class="proj-tag">Windows</span>
+                        <span class="proj-tag">Sysprep</span>
+                        <span class="proj-tag">Unattend</span>
+                        <span class="proj-tag">Automation</span>
+                    </div>
+
+                    <h3 class="proj-title">Automação de Instalação de VMs Windows</h3>
+
+                    <p class="proj-desc">
+                        Automação da criação de máquinas virtuais Windows 11 no Proxmox utilizando
+                        Sysprep e arquivos Unattend. O projeto gera um template de VM já configurado,
+                        permitindo criar novas máquinas Windows instantaneamente através de clonagem.
+                    </p>
+
+                    <p class="proj-desc">
+                        A solução elimina o processo manual de instalação do sistema operacional,
+                        padroniza o ambiente e facilita futuras automações como entrada em domínio
+                        e aplicação de políticas de grupo (GPO).
+                    </p>
+
+                    <div class="proj-footer">
+                        <a href="https://www.linkedin.com/posts/felipe-navarro-9b033a199_como-fazer-um-w11-template-com-sysprep-e-activity-7433848009609646081-1Iwg?utm_source=share&utm_medium=member_desktop&rcm=ACoAAC6AcBQBQEmduvc8dsFpjBQKuDgYy4HKYgY" target="_blank" class="proj-link">Sobre o projeto →</a>
+                        <a href="https://www.youtube.com/watch?v=rnePhc7tTu4" target="_blank" class="proj-link">Video do projeto →</a>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="project-card reveal">
+
+                <div class="proj-thumb">
+                    <div class="proj-placeholder">
+                        <span class="big-icon">⚙️</span>
+                        <span>Linux Aliases Automacao</span>
+                    </div>
+                </div>
+
+                <div class="proj-body">
+
+                    <div class="proj-tags">
+                        <span class="proj-tag">Linux</span>
+                        <span class="proj-tag">Shell</span>
+                        <span class="proj-tag">Automação</span>
+                        <span class="proj-tag">CLI</span>
+                        <span class="proj-tag">Produtividade</span>
+                        <span class="proj-tag">DevOps</span>
+                    </div>
+
+                    <h3 class="proj-title">Automação de Comandos com Aliases no Linux</h3>
+
+                    <p class="proj-desc">
+                        Implementação de aliases no Linux para automatizar comandos recorrentes e otimizar o uso do terminal, reduzindo tarefas repetitivas do dia a dia.
+                    </p>
+
+                    <p class="proj-desc">
+                        O projeto também aborda funções shell e versionamento dos aliases, facilitando reutilização, portabilidade e padronização do ambiente.
+                    </p>
+
+                    <div class="proj-footer">
+                        <a href="https://www.linkedin.com/posts/felipe-navarro-9b033a199_estudando-sobre-linux-descobri-os-aliases-activity-7435715838915076096-0y27?utm_source=share&utm_medium=member_desktop&rcm=ACoAAC6AcBQBQEmduvc8dsFpjBQKuDgYy4HKYgY" target="_blank" class="proj-link">Sobre o projeto →</a>
+                        <a href="https://www.youtube.com/watch?v=l8tcbSpLSrU" target="_blank" class="proj-link">Video do projeto →</a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!--
+                COMO ADICIONAR MAIS PROJETOS:
+                Copie o bloco abaixo, cole após o último .project-card e edite o conteúdo.
+                O grid adiciona a nova coluna automaticamente.
+
+            <div class="project-card reveal">
+                <div class="proj-thumb">
+                    <img src="./assets/img/SEU_SCREENSHOT.png" alt="Nome do Projeto" />
+                    OU use o placeholder:
+                    <div class="proj-placeholder">
+                        <span class="big-icon">🔧</span>
+                        <span>Nome do Projeto</span>
+                    </div>
+                </div>
+                <div class="proj-body">
+                    <div class="proj-tags">
+                        <span class="proj-tag">Tecnologia</span>
+                    </div>
+                    <h3 class="proj-title">Nome do Projeto</h3>
+                    <p class="proj-desc">
+                        Descrição do projeto, o que ele faz e qual problema resolve.
+                    </p>
+                    <div class="proj-footer">
+                        <a href="LINK_GITHUB" target="_blank" class="proj-link">Ver código →</a>
+                    </div>
+                </div>
+            </div>
+            -->
+
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+
+    <!-- ==================== CONTATO ==================== -->
+    <section id="contato">
+        <div class="section-eyebrow">Vamos conversar</div>
+        <h2 class="section-title">Contato</h2>
+        <p class="section-subtitle">
+            Aberto a oportunidades de emprego, freelas, colaborações ou uma boa conversa sobre tecnologia.
+        </p>
+
+        <div class="contato-grid">
+
+            <!-- Links de contato direto -->
+            <div class="contact-cards reveal">
+                <a href="https://linkedin.com/in/felipe-navarro-9b033a199" target="_blank" class="contact-card">
+                    <div class="contact-card-ico">💼</div>
+                    <div>
+                        <strong>LinkedIn</strong>
+                        <span>Felipe Navarro — conecte-se!</span>
+                    </div>
+                </a>
+                <a href="https://github.com/FelipeSilvaNavarro" target="_blank" class="contact-card">
+                    <div class="contact-card-ico">🐙</div>
+                    <div>
+                        <strong>GitHub</strong>
+                        <span>@FelipeSilvaNavarro</span>
+                    </div>
+                </a>
+                <a href="mailto:felipenavarro07@hotmail.com" class="contact-card">
+                    <div class="contact-card-ico">✉️</div>
+                    <div>
+                        <strong>E-mail</strong>
+                        <span>felipenavarro07@hotmail.com</span>
+                    </div>
+                </a>
+                <a href="https://instagram.com/felipes_nv" target="_blank" class="contact-card">
+                    <div class="contact-card-ico">📸</div>
+                    <div>
+                        <strong>Instagram</strong>
+                        <span>@felipes_nv</span>
+                    </div>
+                </a>
+                <a href="https://api.whatsapp.com/send/?phone=5582988130715&text=Ol%C3%A1%21+Vim+pelo+seu+site%21&type=phone_number&app_absent=0" target="_blank" class="contact-card">
+                    <div class="contact-card-ico">💬</div>
+                    <div>
+                        <strong>WhatsApp</strong>
+                        <span>Fale comigo direto!</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Formulário de contato -->
+            <div class="contact-form reveal delay-1">
+                <h3>Envie uma mensagem</h3>
+                <div class="form-group">
+                    <label for="nome">Seu nome</label>
+                    <input type="text" id="nome" placeholder="João Silva" />
+                </div>
+                <div class="form-group">
+                    <label for="email">Seu e-mail</label>
+                    <input type="email" id="email" placeholder="joao@empresa.com" />
+                </div>
+                <div class="form-group">
+                    <label for="msg">Mensagem</label>
+                    <textarea id="msg" placeholder="Olá Felipe, tenho uma oportunidade..."></textarea>
+                </div>
+                <button class="form-btn" onclick="enviarContato()">
+                    Enviar mensagem →
+                </button>
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- ==================== FOOTER ==================== -->
     <footer>
-        <section class="contato" id="contato">
-            <h2 data-aos="fade-up" data-aos-duration="1500" class="text-center fw-bold">Contato</h2>
-            <div class="container">
-                <div class="row">
-                    <div class="footer-column col-12 col-md-4 mb-4" data-aos="zoom-in-up" data-aos-duration="1700">
-                        <a href="https://api.whatsapp.com/send/?phone=5582988130715&text=Ol%C3%A1%21+Vim+pelo+seu+site%21&type=phone_number&app_absent=0">
-                            <img src="./assets/img/Whatsapp.png" alt="Ícone do WhatsApp" class="icon fade-in-image">
-                            <p class="contact-text">Fale comigo pelo Whatsapp!</p>
-                        </a>
-                        <a href="mailto:felipenavarro07@hotmail.com">
-                            <img src="./assets/img/Outlook.png" alt="Ícone de Email" class="icon fade-in-image">
-                            <p class="contact-text">Fale comigo pelo Email!</p>
-                        </a>
-                    </div>
-                    <div class="footer-column col-12 col-md-4 mb-4" data-aos="zoom-in-up" data-aos-duration="2300">
-                        <p>Resido atualmente em:</p><br>
-                        <p>Brazil, Alagoas, Maceió, Cidade Universitária</p>
-                    </div>
-                    <div class="footer-column col-12 col-md-4 mb-4" data-aos="zoom-in-up" data-aos-duration="3000">
-                        <p>Links úteis:</p>
-                        <ul>
-                            <li><img src="./assets/img/Github.png" alt="Ícone do GitHub"><a href="https://github.com/FelipeSilvaNavarro">Github</a></li>
-                            <li><img src="./assets/img/Linkedin.png" alt="Ícone do LinkedIn"><a href="https://www.linkedin.com/in/felipe-navarro-9b033a199/">LinkedIn</a></li>
-                            <li><img src="./assets/img/Instagram.png" alt="Ícone do Instagram"><a href="https://www.instagram.com/felipes_nv/">Instagram</a></li>
-                            <li><img src="./assets/img/Youtube.png" alt="Ícone do YouTube"><a href="https://www.youtube.com/channel/UCL0sca8UmSPrCW5Ob1cLUaA">YouTube</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
+        <div class="footer-logo">Felipe<span class="dot">·</span>dev</div>
+        <p>© 2025 Felipe Silva Navarro — Analista de T.I</p>
+        <div class="footer-socials">
+            <a href="https://linkedin.com/in/felipe-navarro-9b033a199" target="_blank" class="soc-link" title="LinkedIn">💼</a>
+            <a href="https://github.com/FelipeSilvaNavarro" target="_blank" class="soc-link" title="GitHub">🐙</a>
+            <a href="https://instagram.com/felipes_nv" target="_blank" class="soc-link" title="Instagram">📸</a>
+        </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="./assets/js/script.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+
+    <!-- ==================== JAVASCRIPT ==================== -->
     <script>
-        AOS.init({
-            once: true, // Animar elementos apenas uma vez
-            offset: 100, // Deslocamento em pixels antes do elemento ser animado
-            easing: 'ease', // Tipo de animação
+        /* --- Menu hamburger (mobile) --- */
+        const hamburger = document.getElementById('hamburger')
+        const mobileMenu = document.getElementById('mobileMenu')
+
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active')
+            mobileMenu.classList.toggle('open')
+        })
+
+        /* Fecha ao clicar fora do menu */
+        document.addEventListener('click', (e) => {
+            if (!mobileMenu.contains(e.target) && !hamburger.contains(e.target)) {
+                hamburger.classList.remove('active')
+                mobileMenu.classList.remove('open')
+            }
+        })
+
+        /* Fecha ao clicar em um link do menu mobile */
+        mobileMenu.querySelectorAll('a').forEach(a => {
+            a.addEventListener('click', () => {
+                hamburger.classList.remove('active')
+                mobileMenu.classList.remove('open')
+            })
+        })
+
+        /* --- Sombra na navbar ao rolar --- */
+        const navbar = document.getElementById('navbar')
+        window.addEventListener('scroll', () => {
+            navbar.classList.toggle('scrolled', window.scrollY > 20)
+        })
+
+        /* --- Scroll reveal para elementos .reveal --- */
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible')
+            })
+        }, { threshold: 0.1 })
+
+        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el))
+
+        /* --- Smooth scroll para âncoras internas --- */
+        document.querySelectorAll('a[href^="#"]').forEach(a => {
+            a.addEventListener('click', e => {
+                const target = document.querySelector(a.getAttribute('href'))
+                if (target) {
+                    e.preventDefault()
+                    const offset = 74
+                    window.scrollTo({
+                        top: target.getBoundingClientRect().top + window.scrollY - offset,
+                        behavior: 'smooth'
+                    })
+                }
+            })
+        })
+
+        /* --- Formulário de contato: abre cliente de e-mail --- */
+        function enviarContato () {
+            const nome = document.getElementById('nome').value.trim()
+            const email = document.getElementById('email').value.trim()
+            const msg = document.getElementById('msg').value.trim()
+
+            if (!nome || !email || !msg) {
+                alert('Por favor, preencha todos os campos antes de enviar.')
+                return
+            }
+
+            const mailto = `mailto:felipenavarro07@hotmail.com`
+                + `?subject=${encodeURIComponent('Contato via site — ' + nome)}`
+                + `&body=${encodeURIComponent(msg + '\n\nDe: ' + nome + '\nEmail: ' + email)}`
+
+            window.location.href = mailto
         }
-        )
     </script>
+
 </body>
 
 </html>
