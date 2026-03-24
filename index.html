@@ -1450,21 +1450,36 @@
             .hero {
                 grid-template-columns: 1fr;
                 gap: 2rem;
+                padding-top: 7rem;
             }
 
             .hero-photo-wrap {
                 order: -1;
                 display: flex;
                 justify-content: center;
+                margin-top: 1rem;
             }
 
             .hero-photo-frame {
-                width: clamp(160px, 45vw, 260px);
-                aspect-ratio: 1/1;
+                width: clamp(260px, 65vw, 340px);
+                aspect-ratio: 3/4;
             }
 
             .hero-photo-frame img {
                 object-position: center top;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .hero-photo-frame {
+                width: clamp(280px, 75vw, 320px);
+            }
+
+            .online-dot {
+                top: 12px;
+                right: 12px;
+                padding: .2rem .55rem;
+                font-size: .58rem;
             }
         }
 
