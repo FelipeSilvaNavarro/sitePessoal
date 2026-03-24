@@ -930,10 +930,20 @@
 
         /* Diferenciais */
         .diferenciais-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 1.1rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.5rem;
             margin-top: 4rem;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .diferenciais-grid .dif-item {
+            flex: 1 1 260px;
+            max-width: 320px;
+            min-width: 260px;
         }
 
         .dif-item {
@@ -1522,7 +1532,12 @@
             }
 
             .diferenciais-grid {
-                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .diferenciais-grid .dif-item {
+                flex: 1 1 100%;
+                max-width: 100%;
             }
 
             .hero-stats {
