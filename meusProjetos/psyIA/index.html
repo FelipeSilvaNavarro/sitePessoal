@@ -50,12 +50,10 @@
 
     /* === LAYOUT === */
     .app {
-      position: relative;
-      z-index: 1;
-      display: grid;
-      grid-template-columns: var(--sidebar-w) 1fr;
+      display: block;
       height: 100vh;
       height: 100dvh;
+      margin-left: var(--sidebar-w);
     }
 
     /* === SIDEBAR === */
@@ -66,13 +64,18 @@
     }
 
     .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: var(--sidebar-w);
       background: rgba(24, 24, 24, 0.97);
       backdrop-filter: blur(20px);
       display: flex;
       flex-direction: column;
       border-right: 1px solid rgba(122, 158, 135, 0.2);
-      overflow: hidden;
-      transition: left 0.28s ease, transform 0.28s ease;
+      overflow: visible;
+      z-index: 10;
     }
 
     .sidebar-header {
@@ -158,7 +161,8 @@
       display: none;
       flex-direction: column;
       flex: 1;
-      overflow: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     .sidebar-panel.active {
@@ -573,7 +577,6 @@
       height: 100vh;
       height: 100dvh;
       overflow: hidden;
-      min-width: 0;
     }
 
     .topbar {
@@ -1105,17 +1108,13 @@
       }
 
       .app {
-        grid-template-columns: 1fr;
+        margin-left: 0;
       }
 
       .sidebar {
-        position: fixed;
-        top: 0;
-        left: -100vw;
-        bottom: 0;
-        width: var(--sidebar-w);
-        z-index: 496;
+        left: calc(-1 * var(--sidebar-w));
         transition: left 0.28s ease;
+        z-index: 496;
       }
 
       .sidebar.open {
@@ -1245,44 +1244,46 @@
     </div>
   </div>
 
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar" onclick="void(0)">
+    <div class="sidebar-header">
+      <div class="logo">Psy<span>IA</span></div>
+      <div class="logo-sub">Inteligência em Saúde Mental</div>
+    </div>
+
+    <!-- Mode tabs -->
+    <div class="mode-tabs">
+      <button type="button" class="mode-tab active" id="tabSupport" onclick="switchTab('support')">🌿 Apoio</button>
+      <button type="button" class="mode-tab" id="tabPro" onclick="switchTab('pro')">🧠 Profissional</button>
+    </div>
+
+    <!-- Support panel -->
+    <div class="sidebar-panel active" id="panelSupport">
+      <button type="button" class="new-conv-btn" onclick="newConversation()">＋ Nova conversa</button>
+      <div class="panel-label">Conversas</div>
+      <div class="conv-list" id="convList"></div>
+    </div>
+
+    <!-- Pro panel -->
+    <div class="sidebar-panel" id="panelPro">
+      <button type="button" class="new-patient-btn" onclick="newPatient()">＋ Novo paciente</button>
+      <div class="panel-label">Pacientes</div>
+      <div class="patient-list" id="patientList"></div>
+    </div>
+
+    <div class="api-section">
+      <div class="api-label">Chave API Groq</div>
+      <div class="api-input-wrap">
+        <input type="text" class="api-input" id="apiKeyInput" placeholder="gsk_..." autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" />
+        <button class="api-save" onclick="saveKey()">OK</button>
+      </div>
+      <div class="api-status" id="apiStatus">Nenhuma chave salva</div>
+    </div>
+    <div class="disclaimer">⚠️ Ferramenta de apoio — não substitui diagnóstico clínico.</div>
+  </aside>
+
   <div class="app">
-    <!-- SIDEBAR -->
-    <aside class="sidebar" id="sidebar" onclick="void(0)">
-      <div class="sidebar-header">
-        <div class="logo">Psy<span>IA</span></div>
-        <div class="logo-sub">Inteligência em Saúde Mental</div>
-      </div>
 
-      <!-- Mode tabs -->
-      <div class="mode-tabs">
-        <button type="button" class="mode-tab active" id="tabSupport" onclick="switchTab('support')">🌿 Apoio</button>
-        <button type="button" class="mode-tab" id="tabPro" onclick="switchTab('pro')">🧠 Profissional</button>
-      </div>
-
-      <!-- Support panel -->
-      <div class="sidebar-panel active" id="panelSupport">
-        <button type="button" class="new-conv-btn" onclick="newConversation()">＋ Nova conversa</button>
-        <div class="panel-label">Conversas</div>
-        <div class="conv-list" id="convList"></div>
-      </div>
-
-      <!-- Pro panel -->
-      <div class="sidebar-panel" id="panelPro">
-        <button type="button" class="new-patient-btn" onclick="newPatient()">＋ Novo paciente</button>
-        <div class="panel-label">Pacientes</div>
-        <div class="patient-list" id="patientList"></div>
-      </div>
-
-      <div class="api-section">
-        <div class="api-label">Chave API Groq</div>
-        <div class="api-input-wrap">
-          <input type="text" class="api-input" id="apiKeyInput" placeholder="gsk_..." autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" />
-          <button class="api-save" onclick="saveKey()">OK</button>
-        </div>
-        <div class="api-status" id="apiStatus">Nenhuma chave salva</div>
-      </div>
-      <div class="disclaimer">⚠️ Ferramenta de apoio — não substitui diagnóstico clínico.</div>
-    </aside>
 
     <!-- MAIN -->
     <main class="main">
